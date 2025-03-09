@@ -5,7 +5,11 @@ type TextPost struct {
 }
 
 type TextPostGetter interface {
-	GetTextPosts() ([]TextPost, error)
+	GetTextPosts(storeName string) ([]TextPost, error)
+}
+
+type StoreNameGetter interface {
+	GetStoreName() (string, error)
 }
 
 type CheckStatusInput struct {
@@ -19,19 +23,25 @@ type StoreStatusChecker interface {
 type GetStoreStatus struct {
 	textPostGetter     TextPostGetter
 	storeStatusChecker StoreStatusChecker
+	storeNameGetter    StoreNameGetter
 }
 
-func NewGetStoreStatus(tpg TextPostGetter, ssc StoreStatusChecker) *GetStoreStatus {
+func NewGetStoreStatus(tpg TextPostGetter, ssc StoreStatusChecker, sng StoreNameGetter) *GetStoreStatus {
 	return &GetStoreStatus{
 		textPostGetter:     tpg,
 		storeStatusChecker: ssc,
+		storeNameGetter:    sng, //鴨野に相談。別に一店舗だけなら、stringを外部から注入で良くないか？
+		// 店舗名取得は完全にこの構造体の責務外じゃね？
 	}
 }
 
-// 店舗名（@）,時間,→営業状況
 func (g *GetStoreStatus) Do() (bool, error) {
+	storeName, err := g.storeNameGetter.GetStoreName()
+	if err != nil {
+		return false, err
+	}
 
-	tweets, err := g.textPostGetter.GetTextPosts()
+	tweets, err := g.textPostGetter.GetTextPosts(storeName)
 	if err != nil {
 		return false, err
 	}
@@ -53,6 +63,7 @@ func (g *GetStoreStatus) Do() (bool, error) {
 func main() {
 	tgg := &TweetGetter{}
 	grg := &GeminiResponseGetter{}
-	hey := NewGetStoreStatus(tgg, grg)
+	sng := &StoreOfficialPageGetter{}
+	hey := NewGetStoreStatus(tgg, grg, sng)
 	hey.Do()
 }
