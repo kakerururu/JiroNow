@@ -1,0 +1,6 @@
+version: "3"
+
+tasks:
+  ogen:
+    cmds:
+      - ogen --package oas --target api/oas docs/openapi.yaml

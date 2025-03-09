@@ -8,6 +8,8 @@ services:
       - ./backend:/app
     ports:
       - "8080:8080"
+    stdin_open: true
+    tty: true
 
   frontend:
     build:
@@ -17,6 +19,8 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    stdin_open: true
+    tty: true
 
 volumes:
   db-data:

@@ -1,0 +1,35 @@
+openapi: "3.0.3"
+info:
+  title: Share Cart API
+  version: "1.0"
+
+paths:
+  /stores/{storeName}/status:
+    get:
+      parameters:
+        - name: storeName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The name of the store
+      responses:
+        200:
+          description: Store status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [open, closed]
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
