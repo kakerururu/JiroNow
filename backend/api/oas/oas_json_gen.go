@@ -8,14 +8,117 @@ import (
 )
 
 // Encode implements json.Marshaler.
-func (s *ErrorResponse) Encode(e *jx.Encoder) {
+func (s *GetStoreStatusResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ErrorResponse) encodeFields(e *jx.Encoder) {
+func (s *GetStoreStatusResponse) encodeFields(e *jx.Encoder) {
+	{
+		if s.Status.Set {
+			e.FieldStart("status")
+			s.Status.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfGetStoreStatusResponse = [1]string{
+	0: "status",
+}
+
+// Decode decodes GetStoreStatusResponse from json.
+func (s *GetStoreStatusResponse) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetStoreStatusResponse to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"status\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode GetStoreStatusResponse")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *GetStoreStatusResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetStoreStatusResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetStoreStatusResponseStatus as json.
+func (s GetStoreStatusResponseStatus) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GetStoreStatusResponseStatus from json.
+func (s *GetStoreStatusResponseStatus) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetStoreStatusResponseStatus to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GetStoreStatusResponseStatus(v) {
+	case GetStoreStatusResponseStatusOpen:
+		*s = GetStoreStatusResponseStatusOpen
+	case GetStoreStatusResponseStatusClosed:
+		*s = GetStoreStatusResponseStatusClosed
+	default:
+		*s = GetStoreStatusResponseStatus(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetStoreStatusResponseStatus) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetStoreStatusResponseStatus) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *InvalidAccountResponse) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *InvalidAccountResponse) encodeFields(e *jx.Encoder) {
 	{
 		if s.Message.Set {
 			e.FieldStart("message")
@@ -24,14 +127,14 @@ func (s *ErrorResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfErrorResponse = [1]string{
+var jsonFieldsNameOfInvalidAccountResponse = [1]string{
 	0: "message",
 }
 
-// Decode decodes ErrorResponse from json.
-func (s *ErrorResponse) Decode(d *jx.Decoder) error {
+// Decode decodes InvalidAccountResponse from json.
+func (s *InvalidAccountResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ErrorResponse to nil")
+		return errors.New("invalid: unable to decode InvalidAccountResponse to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -51,37 +154,37 @@ func (s *ErrorResponse) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ErrorResponse")
+		return errors.Wrap(err, "decode InvalidAccountResponse")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ErrorResponse) MarshalJSON() ([]byte, error) {
+func (s *InvalidAccountResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ErrorResponse) UnmarshalJSON(data []byte) error {
+func (s *InvalidAccountResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes StoreStatusResponseStatus as json.
-func (o OptStoreStatusResponseStatus) Encode(e *jx.Encoder) {
+// Encode encodes GetStoreStatusResponseStatus as json.
+func (o OptGetStoreStatusResponseStatus) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	e.Str(string(o.Value))
 }
 
-// Decode decodes StoreStatusResponseStatus from json.
-func (o *OptStoreStatusResponseStatus) Decode(d *jx.Decoder) error {
+// Decode decodes GetStoreStatusResponseStatus from json.
+func (o *OptGetStoreStatusResponseStatus) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptStoreStatusResponseStatus to nil")
+		return errors.New("invalid: unable to decode OptGetStoreStatusResponseStatus to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -91,14 +194,14 @@ func (o *OptStoreStatusResponseStatus) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptStoreStatusResponseStatus) MarshalJSON() ([]byte, error) {
+func (s OptGetStoreStatusResponseStatus) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptStoreStatusResponseStatus) UnmarshalJSON(data []byte) error {
+func (s *OptGetStoreStatusResponseStatus) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -139,104 +242,64 @@ func (s *OptString) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *StoreStatusResponse) Encode(e *jx.Encoder) {
+func (s *UnprocessableStoreStatusResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *StoreStatusResponse) encodeFields(e *jx.Encoder) {
+func (s *UnprocessableStoreStatusResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.Status.Set {
-			e.FieldStart("status")
-			s.Status.Encode(e)
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfStoreStatusResponse = [1]string{
-	0: "status",
+var jsonFieldsNameOfUnprocessableStoreStatusResponse = [1]string{
+	0: "message",
 }
 
-// Decode decodes StoreStatusResponse from json.
-func (s *StoreStatusResponse) Decode(d *jx.Decoder) error {
+// Decode decodes UnprocessableStoreStatusResponse from json.
+func (s *UnprocessableStoreStatusResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode StoreStatusResponse to nil")
+		return errors.New("invalid: unable to decode UnprocessableStoreStatusResponse to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "status":
+		case "message":
 			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"status\"")
+				return errors.Wrap(err, "decode field \"message\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode StoreStatusResponse")
+		return errors.Wrap(err, "decode UnprocessableStoreStatusResponse")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *StoreStatusResponse) MarshalJSON() ([]byte, error) {
+func (s *UnprocessableStoreStatusResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *StoreStatusResponse) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes StoreStatusResponseStatus as json.
-func (s StoreStatusResponseStatus) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes StoreStatusResponseStatus from json.
-func (s *StoreStatusResponseStatus) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode StoreStatusResponseStatus to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch StoreStatusResponseStatus(v) {
-	case StoreStatusResponseStatusOpen:
-		*s = StoreStatusResponseStatusOpen
-	case StoreStatusResponseStatusClosed:
-		*s = StoreStatusResponseStatusClosed
-	default:
-		*s = StoreStatusResponseStatus(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s StoreStatusResponseStatus) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *StoreStatusResponseStatus) UnmarshalJSON(data []byte) error {
+func (s *UnprocessableStoreStatusResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

@@ -40,7 +40,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
-	args := [1]string{}
 
 	// Static code generated router with unwrapped path search.
 	switch {
@@ -49,50 +48,24 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/stores/"
+		case '/': // Prefix: "/status"
 			origElem := elem
-			if l := len("/stores/"); len(elem) >= l && elem[0:l] == "/stores/" {
+			if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
-			// Param: "storeName"
-			// Match until "/"
-			idx := strings.IndexByte(elem, '/')
-			if idx < 0 {
-				idx = len(elem)
-			}
-			args[0] = elem[:idx]
-			elem = elem[idx:]
-
 			if len(elem) == 0 {
-				break
-			}
-			switch elem[0] {
-			case '/': // Prefix: "/status"
-				origElem := elem
-				if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
-					elem = elem[l:]
-				} else {
-					break
+				// Leaf node.
+				switch r.Method {
+				case "GET":
+					s.handleStatusGetRequest([0]string{}, elemIsEscaped, w, r)
+				default:
+					s.notAllowed(w, r, "GET")
 				}
 
-				if len(elem) == 0 {
-					// Leaf node.
-					switch r.Method {
-					case "GET":
-						s.handleStoresStoreNameStatusGetRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
-					default:
-						s.notAllowed(w, r, "GET")
-					}
-
-					return
-				}
-
-				elem = origElem
+				return
 			}
 
 			elem = origElem
@@ -108,7 +81,7 @@ type Route struct {
 	operationID string
 	pathPattern string
 	count       int
-	args        [1]string
+	args        [0]string
 }
 
 // Name returns ogen operation name.
@@ -176,52 +149,28 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/stores/"
+		case '/': // Prefix: "/status"
 			origElem := elem
-			if l := len("/stores/"); len(elem) >= l && elem[0:l] == "/stores/" {
+			if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
-			// Param: "storeName"
-			// Match until "/"
-			idx := strings.IndexByte(elem, '/')
-			if idx < 0 {
-				idx = len(elem)
-			}
-			args[0] = elem[:idx]
-			elem = elem[idx:]
-
 			if len(elem) == 0 {
-				break
-			}
-			switch elem[0] {
-			case '/': // Prefix: "/status"
-				origElem := elem
-				if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
-					elem = elem[l:]
-				} else {
-					break
+				// Leaf node.
+				switch method {
+				case "GET":
+					r.name = StatusGetOperation
+					r.summary = ""
+					r.operationID = ""
+					r.pathPattern = "/status"
+					r.args = args
+					r.count = 0
+					return r, true
+				default:
+					return
 				}
-
-				if len(elem) == 0 {
-					// Leaf node.
-					switch method {
-					case "GET":
-						r.name = StoresStoreNameStatusGetOperation
-						r.summary = ""
-						r.operationID = ""
-						r.pathPattern = "/stores/{storeName}/status"
-						r.args = args
-						r.count = 1
-						return r, true
-					default:
-						return
-					}
-				}
-
-				elem = origElem
 			}
 
 			elem = origElem

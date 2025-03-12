@@ -4,9 +4,6 @@ package oas
 
 import (
 	"net/http"
-	"net/url"
-
-	"github.com/go-faster/errors"
 
 	"github.com/ogen-go/ogen/conv"
 	"github.com/ogen-go/ogen/middleware"
@@ -15,42 +12,35 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-// StoresStoreNameStatusGetParams is parameters of GET /stores/{storeName}/status operation.
-type StoresStoreNameStatusGetParams struct {
-	StoreName string
+// StatusGetParams is parameters of GET /status operation.
+type StatusGetParams struct {
+	// Store's Twitter account ID.
+	AccountId string
 }
 
-func unpackStoresStoreNameStatusGetParams(packed middleware.Parameters) (params StoresStoreNameStatusGetParams) {
+func unpackStatusGetParams(packed middleware.Parameters) (params StatusGetParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "storeName",
-			In:   "path",
+			Name: "accountId",
+			In:   "query",
 		}
-		params.StoreName = packed[key].(string)
+		params.AccountId = packed[key].(string)
 	}
 	return params
 }
 
-func decodeStoresStoreNameStatusGetParams(args [1]string, argsEscaped bool, r *http.Request) (params StoresStoreNameStatusGetParams, _ error) {
-	// Decode path: storeName.
+func decodeStatusGetParams(args [0]string, argsEscaped bool, r *http.Request) (params StatusGetParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: accountId.
 	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "accountId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
 		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "storeName",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
 
-			if err := func() error {
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				val, err := d.DecodeValue()
 				if err != nil {
 					return err
@@ -61,9 +51,9 @@ func decodeStoresStoreNameStatusGetParams(args [1]string, argsEscaped bool, r *h
 					return err
 				}
 
-				params.StoreName = c
+				params.AccountId = c
 				return nil
-			}(); err != nil {
+			}); err != nil {
 				return err
 			}
 		} else {
@@ -72,8 +62,8 @@ func decodeStoresStoreNameStatusGetParams(args [1]string, argsEscaped bool, r *h
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "storeName",
-			In:   "path",
+			Name: "accountId",
+			In:   "query",
 			Err:  err,
 		}
 	}

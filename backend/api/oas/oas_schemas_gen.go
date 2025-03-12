@@ -3,87 +3,114 @@
 package oas
 
 import (
-	"fmt"
-
 	"github.com/go-faster/errors"
 )
 
-func (s *ErrorResponseStatusCode) Error() string {
-	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+type GetStoreStatusResponse struct {
+	Status OptGetStoreStatusResponseStatus `json:"status"`
 }
 
-type ErrorResponse struct {
+// GetStatus returns the value of Status.
+func (s *GetStoreStatusResponse) GetStatus() OptGetStoreStatusResponseStatus {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *GetStoreStatusResponse) SetStatus(val OptGetStoreStatusResponseStatus) {
+	s.Status = val
+}
+
+func (*GetStoreStatusResponse) statusGetRes() {}
+
+type GetStoreStatusResponseStatus string
+
+const (
+	GetStoreStatusResponseStatusOpen   GetStoreStatusResponseStatus = "open"
+	GetStoreStatusResponseStatusClosed GetStoreStatusResponseStatus = "closed"
+)
+
+// AllValues returns all GetStoreStatusResponseStatus values.
+func (GetStoreStatusResponseStatus) AllValues() []GetStoreStatusResponseStatus {
+	return []GetStoreStatusResponseStatus{
+		GetStoreStatusResponseStatusOpen,
+		GetStoreStatusResponseStatusClosed,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetStoreStatusResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case GetStoreStatusResponseStatusOpen:
+		return []byte(s), nil
+	case GetStoreStatusResponseStatusClosed:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetStoreStatusResponseStatus) UnmarshalText(data []byte) error {
+	switch GetStoreStatusResponseStatus(data) {
+	case GetStoreStatusResponseStatusOpen:
+		*s = GetStoreStatusResponseStatusOpen
+		return nil
+	case GetStoreStatusResponseStatusClosed:
+		*s = GetStoreStatusResponseStatusClosed
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type InvalidAccountResponse struct {
 	Message OptString `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *ErrorResponse) GetMessage() OptString {
+func (s *InvalidAccountResponse) GetMessage() OptString {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *ErrorResponse) SetMessage(val OptString) {
+func (s *InvalidAccountResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
-// ErrorResponseStatusCode wraps ErrorResponse with StatusCode.
-type ErrorResponseStatusCode struct {
-	StatusCode int
-	Response   ErrorResponse
-}
+func (*InvalidAccountResponse) statusGetRes() {}
 
-// GetStatusCode returns the value of StatusCode.
-func (s *ErrorResponseStatusCode) GetStatusCode() int {
-	return s.StatusCode
-}
-
-// GetResponse returns the value of Response.
-func (s *ErrorResponseStatusCode) GetResponse() ErrorResponse {
-	return s.Response
-}
-
-// SetStatusCode sets the value of StatusCode.
-func (s *ErrorResponseStatusCode) SetStatusCode(val int) {
-	s.StatusCode = val
-}
-
-// SetResponse sets the value of Response.
-func (s *ErrorResponseStatusCode) SetResponse(val ErrorResponse) {
-	s.Response = val
-}
-
-// NewOptStoreStatusResponseStatus returns new OptStoreStatusResponseStatus with value set to v.
-func NewOptStoreStatusResponseStatus(v StoreStatusResponseStatus) OptStoreStatusResponseStatus {
-	return OptStoreStatusResponseStatus{
+// NewOptGetStoreStatusResponseStatus returns new OptGetStoreStatusResponseStatus with value set to v.
+func NewOptGetStoreStatusResponseStatus(v GetStoreStatusResponseStatus) OptGetStoreStatusResponseStatus {
+	return OptGetStoreStatusResponseStatus{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptStoreStatusResponseStatus is optional StoreStatusResponseStatus.
-type OptStoreStatusResponseStatus struct {
-	Value StoreStatusResponseStatus
+// OptGetStoreStatusResponseStatus is optional GetStoreStatusResponseStatus.
+type OptGetStoreStatusResponseStatus struct {
+	Value GetStoreStatusResponseStatus
 	Set   bool
 }
 
-// IsSet returns true if OptStoreStatusResponseStatus was set.
-func (o OptStoreStatusResponseStatus) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetStoreStatusResponseStatus was set.
+func (o OptGetStoreStatusResponseStatus) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptStoreStatusResponseStatus) Reset() {
-	var v StoreStatusResponseStatus
+func (o *OptGetStoreStatusResponseStatus) Reset() {
+	var v GetStoreStatusResponseStatus
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptStoreStatusResponseStatus) SetTo(v StoreStatusResponseStatus) {
+func (o *OptGetStoreStatusResponseStatus) SetTo(v GetStoreStatusResponseStatus) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptStoreStatusResponseStatus) Get() (v StoreStatusResponseStatus, ok bool) {
+func (o OptGetStoreStatusResponseStatus) Get() (v GetStoreStatusResponseStatus, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -91,7 +118,7 @@ func (o OptStoreStatusResponseStatus) Get() (v StoreStatusResponseStatus, ok boo
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptStoreStatusResponseStatus) Or(d StoreStatusResponseStatus) StoreStatusResponseStatus {
+func (o OptGetStoreStatusResponseStatus) Or(d GetStoreStatusResponseStatus) GetStoreStatusResponseStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -144,57 +171,18 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-type StoreStatusResponse struct {
-	Status OptStoreStatusResponseStatus `json:"status"`
+type UnprocessableStoreStatusResponse struct {
+	Message OptString `json:"message"`
 }
 
-// GetStatus returns the value of Status.
-func (s *StoreStatusResponse) GetStatus() OptStoreStatusResponseStatus {
-	return s.Status
+// GetMessage returns the value of Message.
+func (s *UnprocessableStoreStatusResponse) GetMessage() OptString {
+	return s.Message
 }
 
-// SetStatus sets the value of Status.
-func (s *StoreStatusResponse) SetStatus(val OptStoreStatusResponseStatus) {
-	s.Status = val
+// SetMessage sets the value of Message.
+func (s *UnprocessableStoreStatusResponse) SetMessage(val OptString) {
+	s.Message = val
 }
 
-type StoreStatusResponseStatus string
-
-const (
-	StoreStatusResponseStatusOpen   StoreStatusResponseStatus = "open"
-	StoreStatusResponseStatusClosed StoreStatusResponseStatus = "closed"
-)
-
-// AllValues returns all StoreStatusResponseStatus values.
-func (StoreStatusResponseStatus) AllValues() []StoreStatusResponseStatus {
-	return []StoreStatusResponseStatus{
-		StoreStatusResponseStatusOpen,
-		StoreStatusResponseStatusClosed,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s StoreStatusResponseStatus) MarshalText() ([]byte, error) {
-	switch s {
-	case StoreStatusResponseStatusOpen:
-		return []byte(s), nil
-	case StoreStatusResponseStatusClosed:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *StoreStatusResponseStatus) UnmarshalText(data []byte) error {
-	switch StoreStatusResponseStatus(data) {
-	case StoreStatusResponseStatusOpen:
-		*s = StoreStatusResponseStatusOpen
-		return nil
-	case StoreStatusResponseStatusClosed:
-		*s = StoreStatusResponseStatusClosed
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
+func (*UnprocessableStoreStatusResponse) statusGetRes() {}

@@ -27,10 +27,12 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// StoresStoreNameStatusGet invokes GET /stores/{storeName}/status operation.
+	// StatusGet invokes GET /status operation.
 	//
-	// GET /stores/{storeName}/status
-	StoresStoreNameStatusGet(ctx context.Context, params StoresStoreNameStatusGetParams) (*StoreStatusResponse, error)
+	// Return the status of a store based on thr specified account's tweets.
+	//
+	// GET /status
+	StatusGet(ctx context.Context, params StatusGetParams) (StatusGetRes, error)
 }
 
 // Client implements OAS client.
@@ -38,12 +40,8 @@ type Client struct {
 	serverURL *url.URL
 	baseClient
 }
-type errorHandler interface {
-	NewError(ctx context.Context, err error) *ErrorResponseStatusCode
-}
 
 var _ Handler = struct {
-	errorHandler
 	*Client
 }{}
 
@@ -80,18 +78,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// StoresStoreNameStatusGet invokes GET /stores/{storeName}/status operation.
+// StatusGet invokes GET /status operation.
 //
-// GET /stores/{storeName}/status
-func (c *Client) StoresStoreNameStatusGet(ctx context.Context, params StoresStoreNameStatusGetParams) (*StoreStatusResponse, error) {
-	res, err := c.sendStoresStoreNameStatusGet(ctx, params)
+// Return the status of a store based on thr specified account's tweets.
+//
+// GET /status
+func (c *Client) StatusGet(ctx context.Context, params StatusGetParams) (StatusGetRes, error) {
+	res, err := c.sendStatusGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendStoresStoreNameStatusGet(ctx context.Context, params StoresStoreNameStatusGetParams) (res *StoreStatusResponse, err error) {
+func (c *Client) sendStatusGet(ctx context.Context, params StatusGetParams) (res StatusGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/stores/{storeName}/status"),
+		semconv.HTTPRouteKey.String("/status"),
 	}
 
 	// Run stopwatch.
@@ -106,7 +106,7 @@ func (c *Client) sendStoresStoreNameStatusGet(ctx context.Context, params Stores
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, StoresStoreNameStatusGetOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, StatusGetOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -123,28 +123,27 @@ func (c *Client) sendStoresStoreNameStatusGet(ctx context.Context, params Stores
 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/stores/"
-	{
-		// Encode "storeName" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "storeName",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.StoreName))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/status"
+	var pathParts [1]string
+	pathParts[0] = "/status"
 	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "accountId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "accountId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.AccountId))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
@@ -160,7 +159,7 @@ func (c *Client) sendStoresStoreNameStatusGet(ctx context.Context, params Stores
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeStoresStoreNameStatusGetResponse(resp)
+	result, err := decodeStatusGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

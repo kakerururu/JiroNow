@@ -29,19 +29,21 @@ func (c *codeRecorder) WriteHeader(status int) {
 	c.ResponseWriter.WriteHeader(status)
 }
 
-// handleStoresStoreNameStatusGetRequest handles GET /stores/{storeName}/status operation.
+// handleStatusGetRequest handles GET /status operation.
 //
-// GET /stores/{storeName}/status
-func (s *Server) handleStoresStoreNameStatusGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// Return the status of a store based on thr specified account's tweets.
+//
+// GET /status
+func (s *Server) handleStatusGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/stores/{storeName}/status"),
+		semconv.HTTPRouteKey.String("/status"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), StoresStoreNameStatusGetOperation,
+	ctx, span := s.cfg.Tracer.Start(r.Context(), StatusGetOperation,
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -96,11 +98,11 @@ func (s *Server) handleStoresStoreNameStatusGetRequest(args [1]string, argsEscap
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: StoresStoreNameStatusGetOperation,
+			Name: StatusGetOperation,
 			ID:   "",
 		}
 	)
-	params, err := decodeStoresStoreNameStatusGetParams(args, argsEscaped, r)
+	params, err := decodeStatusGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -111,27 +113,27 @@ func (s *Server) handleStoresStoreNameStatusGetRequest(args [1]string, argsEscap
 		return
 	}
 
-	var response *StoreStatusResponse
+	var response StatusGetRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    StoresStoreNameStatusGetOperation,
+			OperationName:    StatusGetOperation,
 			OperationSummary: "",
 			OperationID:      "",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "storeName",
-					In:   "path",
-				}: params.StoreName,
+					Name: "accountId",
+					In:   "query",
+				}: params.AccountId,
 			},
 			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = StoresStoreNameStatusGetParams
-			Response = *StoreStatusResponse
+			Params   = StatusGetParams
+			Response = StatusGetRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -140,33 +142,22 @@ func (s *Server) handleStoresStoreNameStatusGetRequest(args [1]string, argsEscap
 		](
 			m,
 			mreq,
-			unpackStoresStoreNameStatusGetParams,
+			unpackStatusGetParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.StoresStoreNameStatusGet(ctx, params)
+				response, err = s.h.StatusGet(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.StoresStoreNameStatusGet(ctx, params)
+		response, err = s.h.StatusGet(ctx, params)
 	}
 	if err != nil {
-		if errRes, ok := errors.Into[*ErrorResponseStatusCode](err); ok {
-			if err := encodeErrorResponse(errRes, w, span); err != nil {
-				defer recordError("Internal", err)
-			}
-			return
-		}
-		if errors.Is(err, ht.ErrNotImplemented) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
-			defer recordError("Internal", err)
-		}
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
 
-	if err := encodeStoresStoreNameStatusGetResponse(response, w, span); err != nil {
+	if err := encodeStatusGetResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

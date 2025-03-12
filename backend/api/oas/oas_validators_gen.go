@@ -8,7 +8,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *StoreStatusResponse) Validate() error {
+func (s *GetStoreStatusResponse) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -38,7 +38,7 @@ func (s *StoreStatusResponse) Validate() error {
 	return nil
 }
 
-func (s StoreStatusResponseStatus) Validate() error {
+func (s GetStoreStatusResponseStatus) Validate() error {
 	switch s {
 	case "open":
 		return nil

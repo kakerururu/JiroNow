@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeStoresStoreNameStatusGetResponse(resp *http.Response) (res *StoreStatusResponse, _ error) {
+func decodeStatusGetResponse(resp *http.Response) (res StatusGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -30,7 +30,7 @@ func decodeStoresStoreNameStatusGetResponse(resp *http.Response) (res *StoreStat
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response StoreStatusResponse
+			var response GetStoreStatusResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -60,9 +60,8 @@ func decodeStoresStoreNameStatusGetResponse(resp *http.Response) (res *StoreStat
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	}
-	// Convenient error response.
-	defRes, err := func() (res *ErrorResponseStatusCode, err error) {
+	case 400:
+		// Code 400.
 		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 		if err != nil {
 			return res, errors.Wrap(err, "parse media type")
@@ -75,7 +74,7 @@ func decodeStoresStoreNameStatusGetResponse(resp *http.Response) (res *StoreStat
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ErrorResponse
+			var response InvalidAccountResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -92,16 +91,45 @@ func decodeStoresStoreNameStatusGetResponse(resp *http.Response) (res *StoreStat
 				}
 				return res, err
 			}
-			return &ErrorResponseStatusCode{
-				StatusCode: resp.StatusCode,
-				Response:   response,
-			}, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
-	}()
-	if err != nil {
-		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	case 500:
+		// Code 500.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response UnprocessableStoreStatusResponse
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
 	}
-	return res, errors.Wrap(defRes, "error")
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
