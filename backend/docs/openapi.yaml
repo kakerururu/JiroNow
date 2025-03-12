@@ -6,6 +6,7 @@ info:
 paths:
   /stores/{storeName}/status:
     get:
+      description: "Return the status of store based on its name"
       parameters:
         - name: storeName
           in: path
