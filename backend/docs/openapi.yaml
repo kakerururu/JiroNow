@@ -14,29 +14,29 @@ paths:
             type: string
       responses:
         200:
-          description: Store status
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StoreStatusResponse"
+          $ref: "#/components/responses/StoreStatusResponse"
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+          $ref: "#/components/responses/ErrorResponse"
 
 components:
-  schemas:
+  responses:
     StoreStatusResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum: [open, closed]
+      description: "Store status response"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [open, closed]
 
     ErrorResponse:
-      type: object
-      properties:
-        message:
-          type: string
+      description: "Error response"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
