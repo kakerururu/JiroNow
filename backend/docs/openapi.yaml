@@ -4,20 +4,23 @@ info:
   version: "1.0"
 
 paths:
-  /stores/{storeName}/status:
+  /status:
     get:
-      description: "Return the status of store based on its name"
+      description: "Return the status of a store based on thr specified account's tweets"
       parameters:
-        - name: storeName
-          in: path
+        - name: accountId
+          in: query
           required: true
           schema:
             type: string
+          description: "Store's Twitter account ID"
       responses:
-        200:
+        "200":
           $ref: "#/components/responses/GetStoreStatusResponse"
-        default:
-          $ref: "#/components/responses/InternalSreverErrorResponse"
+        "400":
+          $ref: "#/components/responses/InvalidAccountResponse"
+        "500":
+          $ref: "#/components/responses/UnprocessableStoreStatusResponse"
 
 components:
   responses:
