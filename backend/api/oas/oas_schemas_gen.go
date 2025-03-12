@@ -12,7 +12,6 @@ func (s *ErrorResponseStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
-// Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
 	Message OptString `json:"message"`
 }
@@ -145,7 +144,6 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// Ref: #/components/schemas/StoreStatusResponse
 type StoreStatusResponse struct {
 	Status OptStoreStatusResponseStatus `json:"status"`
 }
