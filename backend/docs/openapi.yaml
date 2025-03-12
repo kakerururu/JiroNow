@@ -14,13 +14,13 @@ paths:
             type: string
       responses:
         200:
-          $ref: "#/components/responses/StoreStatusResponse"
+          $ref: "#/components/responses/GetStoreStatusResponse"
         default:
-          $ref: "#/components/responses/ErrorResponse"
+          $ref: "#/components/responses/InternalSreverErrorResponse"
 
 components:
   responses:
-    StoreStatusResponse:
+    GetStoreStatusResponse:
       description: "Store status response"
       content:
         application/json:
@@ -31,7 +31,7 @@ components:
                 type: string
                 enum: [open, closed]
 
-    ErrorResponse:
+    InternalSreverErrorResponse:
       description: "Error response"
       content:
         application/json:
