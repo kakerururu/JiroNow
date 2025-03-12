@@ -35,8 +35,18 @@ components:
                 type: string
                 enum: [open, closed]
 
-    InternalSreverErrorResponse:
-      description: "Error response"
+    InvalidAccountResponse:
+      description: "the specified account does not exist"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+    UnprocessableStoreStatusResponse:
+      description: "Unable to determine store status from the specified account's information"
       content:
         application/json:
           schema:
