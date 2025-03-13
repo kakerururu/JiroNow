@@ -4,11 +4,11 @@ info:
   version: "1.0"
 
 paths:
-  /status:
+  /store/status:
     get:
-      description: "Return the status of a store based on thr specified account's tweets"
+      description: "Determines if a store is open or closed by analyzing posts associated with a given account."
       parameters:
-        - name: accountId
+        - name: xAccountId
           in: query
           required: true
           schema:
@@ -17,9 +17,9 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GetStoreStatusResponse"
-        "400":
-          $ref: "#/components/responses/InvalidAccountResponse"
-        "500":
+        "404":
+          $ref: "#/components/responses/AccountNotFoundResponse"
+        "520":
           $ref: "#/components/responses/UnprocessableStoreStatusResponse"
 
 components:
@@ -35,7 +35,7 @@ components:
                 type: string
                 enum: [open, closed]
 
-    InvalidAccountResponse:
+    AccountNotFoundResponse:
       description: "the specified account does not exist"
       content:
         application/json:
