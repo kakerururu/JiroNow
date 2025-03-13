@@ -13,6 +13,7 @@ paths:
           required: true
           schema:
             type: string
+            example: "88kasyo"
           description: "Store's Twitter account ID"
       responses:
         "200":
@@ -21,6 +22,8 @@ paths:
           $ref: "#/components/responses/AccountNotFoundResponse"
         "520":
           $ref: "#/components/responses/UnprocessableStoreStatusResponse"
+        default:
+          $ref: "#/components/responses/InternalServerErrorResponse"
 
 components:
   responses:
@@ -46,7 +49,17 @@ components:
                 type: string
 
     UnprocessableStoreStatusResponse:
-      description: "Unable to determine store status from the specified account's information"
+      description: "Unable to determine store status from  specified account's posts"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+    InternalServerErrorResponse:
+      description: "Internal server error"
       content:
         application/json:
           schema:
