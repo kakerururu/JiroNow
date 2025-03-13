@@ -12,29 +12,29 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-// StatusGetParams is parameters of GET /status operation.
-type StatusGetParams struct {
+// StoreStatusGetParams is parameters of GET /store/status operation.
+type StoreStatusGetParams struct {
 	// Store's Twitter account ID.
-	AccountId string
+	XAccountId string
 }
 
-func unpackStatusGetParams(packed middleware.Parameters) (params StatusGetParams) {
+func unpackStoreStatusGetParams(packed middleware.Parameters) (params StoreStatusGetParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "accountId",
+			Name: "xAccountId",
 			In:   "query",
 		}
-		params.AccountId = packed[key].(string)
+		params.XAccountId = packed[key].(string)
 	}
 	return params
 }
 
-func decodeStatusGetParams(args [0]string, argsEscaped bool, r *http.Request) (params StatusGetParams, _ error) {
+func decodeStoreStatusGetParams(args [0]string, argsEscaped bool, r *http.Request) (params StoreStatusGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: accountId.
+	// Decode query: xAccountId.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "accountId",
+			Name:    "xAccountId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
@@ -51,7 +51,7 @@ func decodeStatusGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 					return err
 				}
 
-				params.AccountId = c
+				params.XAccountId = c
 				return nil
 			}); err != nil {
 				return err
@@ -62,7 +62,7 @@ func decodeStatusGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "accountId",
+			Name: "xAccountId",
 			In:   "query",
 			Err:  err,
 		}

@@ -27,12 +27,12 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// StatusGet invokes GET /status operation.
+	// StoreStatusGet invokes GET /store/status operation.
 	//
-	// Return the status of a store based on thr specified account's tweets.
+	// Determines if a store is open or closed by analyzing posts associated with a given account.
 	//
-	// GET /status
-	StatusGet(ctx context.Context, params StatusGetParams) (StatusGetRes, error)
+	// GET /store/status
+	StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (StoreStatusGetRes, error)
 }
 
 // Client implements OAS client.
@@ -40,8 +40,12 @@ type Client struct {
 	serverURL *url.URL
 	baseClient
 }
+type errorHandler interface {
+	NewError(ctx context.Context, err error) *InternalServerErrorResponseStatusCode
+}
 
 var _ Handler = struct {
+	errorHandler
 	*Client
 }{}
 
@@ -78,20 +82,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// StatusGet invokes GET /status operation.
+// StoreStatusGet invokes GET /store/status operation.
 //
-// Return the status of a store based on thr specified account's tweets.
+// Determines if a store is open or closed by analyzing posts associated with a given account.
 //
-// GET /status
-func (c *Client) StatusGet(ctx context.Context, params StatusGetParams) (StatusGetRes, error) {
-	res, err := c.sendStatusGet(ctx, params)
+// GET /store/status
+func (c *Client) StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (StoreStatusGetRes, error) {
+	res, err := c.sendStoreStatusGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendStatusGet(ctx context.Context, params StatusGetParams) (res StatusGetRes, err error) {
+func (c *Client) sendStoreStatusGet(ctx context.Context, params StoreStatusGetParams) (res StoreStatusGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/status"),
+		semconv.HTTPRouteKey.String("/store/status"),
 	}
 
 	// Run stopwatch.
@@ -106,7 +110,7 @@ func (c *Client) sendStatusGet(ctx context.Context, params StatusGetParams) (res
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, StatusGetOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, StoreStatusGetOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -124,21 +128,21 @@ func (c *Client) sendStatusGet(ctx context.Context, params StatusGetParams) (res
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/status"
+	pathParts[0] = "/store/status"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "accountId" parameter.
+		// Encode "xAccountId" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "accountId",
+			Name:    "xAccountId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.AccountId))
+			return e.EncodeValue(conv.StringToString(params.XAccountId))
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -159,7 +163,7 @@ func (c *Client) sendStatusGet(ctx context.Context, params StatusGetParams) (res
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeStatusGetResponse(resp)
+	result, err := decodeStoreStatusGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

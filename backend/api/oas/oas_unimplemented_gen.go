@@ -13,11 +13,19 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// StatusGet implements GET /status operation.
+// StoreStatusGet implements GET /store/status operation.
 //
-// Return the status of a store based on thr specified account's tweets.
+// Determines if a store is open or closed by analyzing posts associated with a given account.
 //
-// GET /status
-func (UnimplementedHandler) StatusGet(ctx context.Context, params StatusGetParams) (r StatusGetRes, _ error) {
+// GET /store/status
+func (UnimplementedHandler) StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (r StoreStatusGetRes, _ error) {
 	return r, ht.ErrNotImplemented
+}
+
+// NewError creates *InternalServerErrorResponseStatusCode from error returned by handler.
+//
+// Used for common default response.
+func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *InternalServerErrorResponseStatusCode) {
+	r = new(InternalServerErrorResponseStatusCode)
+	return r
 }

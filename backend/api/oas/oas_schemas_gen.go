@@ -3,8 +3,30 @@
 package oas
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 )
+
+func (s *InternalServerErrorResponseStatusCode) Error() string {
+	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+}
+
+type AccountNotFoundResponse struct {
+	Message OptString `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *AccountNotFoundResponse) GetMessage() OptString {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *AccountNotFoundResponse) SetMessage(val OptString) {
+	s.Message = val
+}
+
+func (*AccountNotFoundResponse) storeStatusGetRes() {}
 
 type GetStoreStatusResponse struct {
 	Status OptGetStoreStatusResponseStatus `json:"status"`
@@ -20,7 +42,7 @@ func (s *GetStoreStatusResponse) SetStatus(val OptGetStoreStatusResponseStatus) 
 	s.Status = val
 }
 
-func (*GetStoreStatusResponse) statusGetRes() {}
+func (*GetStoreStatusResponse) storeStatusGetRes() {}
 
 type GetStoreStatusResponseStatus string
 
@@ -63,21 +85,45 @@ func (s *GetStoreStatusResponseStatus) UnmarshalText(data []byte) error {
 	}
 }
 
-type InvalidAccountResponse struct {
+type InternalServerErrorResponse struct {
 	Message OptString `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *InvalidAccountResponse) GetMessage() OptString {
+func (s *InternalServerErrorResponse) GetMessage() OptString {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *InvalidAccountResponse) SetMessage(val OptString) {
+func (s *InternalServerErrorResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
-func (*InvalidAccountResponse) statusGetRes() {}
+// InternalServerErrorResponseStatusCode wraps InternalServerErrorResponse with StatusCode.
+type InternalServerErrorResponseStatusCode struct {
+	StatusCode int
+	Response   InternalServerErrorResponse
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *InternalServerErrorResponseStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *InternalServerErrorResponseStatusCode) GetResponse() InternalServerErrorResponse {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *InternalServerErrorResponseStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *InternalServerErrorResponseStatusCode) SetResponse(val InternalServerErrorResponse) {
+	s.Response = val
+}
 
 // NewOptGetStoreStatusResponseStatus returns new OptGetStoreStatusResponseStatus with value set to v.
 func NewOptGetStoreStatusResponseStatus(v GetStoreStatusResponseStatus) OptGetStoreStatusResponseStatus {
@@ -185,4 +231,4 @@ func (s *UnprocessableStoreStatusResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
-func (*UnprocessableStoreStatusResponse) statusGetRes() {}
+func (*UnprocessableStoreStatusResponse) storeStatusGetRes() {}

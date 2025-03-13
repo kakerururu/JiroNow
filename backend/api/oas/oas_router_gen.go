@@ -48,9 +48,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/status"
+		case '/': // Prefix: "/store/status"
 			origElem := elem
-			if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
+			if l := len("/store/status"); len(elem) >= l && elem[0:l] == "/store/status" {
 				elem = elem[l:]
 			} else {
 				break
@@ -60,7 +60,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				// Leaf node.
 				switch r.Method {
 				case "GET":
-					s.handleStatusGetRequest([0]string{}, elemIsEscaped, w, r)
+					s.handleStoreStatusGetRequest([0]string{}, elemIsEscaped, w, r)
 				default:
 					s.notAllowed(w, r, "GET")
 				}
@@ -149,9 +149,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/status"
+		case '/': // Prefix: "/store/status"
 			origElem := elem
-			if l := len("/status"); len(elem) >= l && elem[0:l] == "/status" {
+			if l := len("/store/status"); len(elem) >= l && elem[0:l] == "/store/status" {
 				elem = elem[l:]
 			} else {
 				break
@@ -161,10 +161,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				// Leaf node.
 				switch method {
 				case "GET":
-					r.name = StatusGetOperation
+					r.name = StoreStatusGetOperation
 					r.summary = ""
 					r.operationID = ""
-					r.pathPattern = "/status"
+					r.pathPattern = "/store/status"
 					r.args = args
 					r.count = 0
 					return r, true

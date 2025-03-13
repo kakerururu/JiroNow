@@ -8,6 +8,69 @@ import (
 )
 
 // Encode implements json.Marshaler.
+func (s *AccountNotFoundResponse) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *AccountNotFoundResponse) encodeFields(e *jx.Encoder) {
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfAccountNotFoundResponse = [1]string{
+	0: "message",
+}
+
+// Decode decodes AccountNotFoundResponse from json.
+func (s *AccountNotFoundResponse) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode AccountNotFoundResponse to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode AccountNotFoundResponse")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *AccountNotFoundResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *AccountNotFoundResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *GetStoreStatusResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -111,14 +174,14 @@ func (s *GetStoreStatusResponseStatus) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *InvalidAccountResponse) Encode(e *jx.Encoder) {
+func (s *InternalServerErrorResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *InvalidAccountResponse) encodeFields(e *jx.Encoder) {
+func (s *InternalServerErrorResponse) encodeFields(e *jx.Encoder) {
 	{
 		if s.Message.Set {
 			e.FieldStart("message")
@@ -127,14 +190,14 @@ func (s *InvalidAccountResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfInvalidAccountResponse = [1]string{
+var jsonFieldsNameOfInternalServerErrorResponse = [1]string{
 	0: "message",
 }
 
-// Decode decodes InvalidAccountResponse from json.
-func (s *InvalidAccountResponse) Decode(d *jx.Decoder) error {
+// Decode decodes InternalServerErrorResponse from json.
+func (s *InternalServerErrorResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode InvalidAccountResponse to nil")
+		return errors.New("invalid: unable to decode InternalServerErrorResponse to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -154,21 +217,21 @@ func (s *InvalidAccountResponse) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode InvalidAccountResponse")
+		return errors.Wrap(err, "decode InternalServerErrorResponse")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *InvalidAccountResponse) MarshalJSON() ([]byte, error) {
+func (s *InternalServerErrorResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *InvalidAccountResponse) UnmarshalJSON(data []byte) error {
+func (s *InternalServerErrorResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

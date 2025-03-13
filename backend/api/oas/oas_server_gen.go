@@ -8,12 +8,16 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// StatusGet implements GET /status operation.
+	// StoreStatusGet implements GET /store/status operation.
 	//
-	// Return the status of a store based on thr specified account's tweets.
+	// Determines if a store is open or closed by analyzing posts associated with a given account.
 	//
-	// GET /status
-	StatusGet(ctx context.Context, params StatusGetParams) (StatusGetRes, error)
+	// GET /store/status
+	StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (StoreStatusGetRes, error)
+	// NewError creates *InternalServerErrorResponseStatusCode from error returned by handler.
+	//
+	// Used for common default response.
+	NewError(ctx context.Context, err error) *InternalServerErrorResponseStatusCode
 }
 
 // Server implements http server based on OpenAPI v3 specification and
