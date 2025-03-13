@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 )
 
@@ -25,7 +26,13 @@ func NewGetStoreStatus(tpg TextPostsGetter, ssc StoreStatusChecker) GetStoreStat
 
 func (g *getStoreStatus) Do(ctx context.Context, XAccountID string) (string, error) {
 	tweets, err := g.textPostGetter.GetTextPosts(XAccountID)
+
 	if err != nil {
+		var accountNotFoundError *AccountNotFoundError
+		if errors.As(err, &accountNotFoundError) {
+			slog.ErrorContext(ctx, "account not found", "error", err)
+			return "", &AccountNotFoundError{}
+		}
 		slog.ErrorContext(ctx, "failed to get text posts", "error", err)
 		return "", err
 	}
@@ -58,4 +65,12 @@ type CheckStatusInput struct {
 
 type StoreStatusChecker interface {
 	CheckStatus(input CheckStatusInput) (string, error)
+}
+
+var _ TextPostsGetter = (*textPostsGetter)(nil)
+
+type textPostsGetter struct{}
+
+func (t *textPostsGetter) GetTextPosts(XAccountID string) ([]TextPost, error) {
+	return nil, &AccountNotFoundError{}
 }
