@@ -2,15 +2,14 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 )
+
+var _ GetStoreStatus = (*getStoreStatus)(nil)
 
 type GetStoreStatus interface {
 	Do(ctx context.Context, XAccountID string) (string, error)
 }
-
-var _ GetStoreStatus = (*getStoreStatus)(nil)
 
 type getStoreStatus struct {
 	textPostGetter     TextPostsGetter
@@ -25,28 +24,24 @@ func NewGetStoreStatus(tpg TextPostsGetter, ssc StoreStatusChecker) GetStoreStat
 }
 
 func (g *getStoreStatus) Do(ctx context.Context, XAccountID string) (string, error) {
-	tweets, err := g.textPostGetter.GetTextPosts(XAccountID)
+	textPosts, err := g.textPostGetter.GetTextPosts(ctx, XAccountID)
 
 	if err != nil {
-		var accountNotFoundError *AccountNotFoundError
-		if errors.As(err, &accountNotFoundError) {
-			slog.ErrorContext(ctx, "account not found", "error", err)
-			return "", &AccountNotFoundError{}
-		}
-		slog.ErrorContext(ctx, "failed to get text posts", "error", err)
+
+		slog.Error("failed to get text posts")
 		return "", err
 	}
 
-	posts := make([]string, len(tweets))
-	for i, tweet := range tweets {
+	posts := make([]string, len(textPosts))
+	for i, tweet := range textPosts {
 		posts[i] = tweet.Post
 	}
 
-	status, err := g.storeStatusChecker.CheckStatus(CheckStatusInput{
+	status, err := g.storeStatusChecker.CheckStatus(ctx, CheckStatusInput{
 		Posts: posts,
 	})
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to check status", "error", err)
+		slog.Error("failed to check status")
 		return "", err
 	}
 	return status, nil
@@ -56,7 +51,7 @@ type TextPost struct {
 	Post string
 }
 type TextPostsGetter interface {
-	GetTextPosts(XAccountID string) ([]TextPost, error)
+	GetTextPosts(ctx context.Context, XAccountID string) ([]TextPost, error)
 }
 
 type CheckStatusInput struct {
@@ -64,13 +59,5 @@ type CheckStatusInput struct {
 }
 
 type StoreStatusChecker interface {
-	CheckStatus(input CheckStatusInput) (string, error)
-}
-
-var _ TextPostsGetter = (*textPostsGetter)(nil)
-
-type textPostsGetter struct{}
-
-func (t *textPostsGetter) GetTextPosts(XAccountID string) ([]TextPost, error) {
-	return nil, &AccountNotFoundError{}
+	CheckStatus(ctx context.Context, input CheckStatusInput) (string, error)
 }
