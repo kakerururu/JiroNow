@@ -8,7 +8,7 @@ import (
 var _ GetStoreStatus = (*getStoreStatus)(nil)
 
 type GetStoreStatus interface {
-	Do(ctx context.Context, XAccountID string) (string, error)
+	Do(ctx context.Context, XAccountID string) (StoreStatus, error)
 }
 
 type getStoreStatus struct {
@@ -23,7 +23,7 @@ func NewGetStoreStatus(tpg TextPostsGetter, ssc StoreStatusChecker) GetStoreStat
 	}
 }
 
-func (g *getStoreStatus) Do(ctx context.Context, XAccountID string) (string, error) {
+func (g *getStoreStatus) Do(ctx context.Context, XAccountID string) (StoreStatus, error) {
 	textPosts, err := g.textPostGetter.GetTextPosts(ctx, XAccountID)
 
 	if err != nil {
@@ -58,6 +58,13 @@ type CheckStatusInput struct {
 	Posts []string
 }
 
+type StoreStatus string
+
+const (
+	StoreStatusOpen   StoreStatus = "open"
+	StoreStatusClosed StoreStatus = "closed"
+)
+
 type StoreStatusChecker interface {
-	CheckStatus(ctx context.Context, input CheckStatusInput) (string, error)
+	CheckStatus(ctx context.Context, input CheckStatusInput) (StoreStatus, error)
 }
