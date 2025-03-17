@@ -5,35 +5,24 @@ import (
 	"log/slog"
 )
 
+type GetStoreStatus interface {
+	DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error)
+}
+
 var _ GetStoreStatus = (*getStoreStatus)(nil)
 
-type GetStoreStatus interface {
-	Do(ctx context.Context) (StoreStatus, error)
-}
-
 type getStoreStatus struct {
-	textPostGetter     TextPostsGetter
 	storeStatusChecker StoreStatusChecker
-	storeIDGetter      storeIDGetter
 }
 
-func NewGetStoreStatus(tpg TextPostsGetter, ssc StoreStatusChecker, sig storeIDGetter) GetStoreStatus {
+func NewGetStoreStatus(ssc StoreStatusChecker) GetStoreStatus {
 	return &getStoreStatus{
-		textPostGetter:     tpg,
 		storeStatusChecker: ssc,
-		storeIDGetter:      sig,
 	}
 }
 
-func (g *getStoreStatus) Do(ctx context.Context) (StoreStatus, error) {
-	StoreID, err := g.storeIDGetter.GetStoreID(ctx)
-	if err != nil {
-		slog.Error("failed to get store id")
-		return "", err
-	}
-
-	textPosts, err := g.textPostGetter.GetTextPosts(ctx, StoreID)
-
+func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error) {
+	textPosts, err := tpg.GetTextPosts(ctx)
 	if err != nil {
 		slog.Error("failed to get text posts")
 		return "", err
@@ -51,6 +40,7 @@ func (g *getStoreStatus) Do(ctx context.Context) (StoreStatus, error) {
 		slog.Error("failed to check status")
 		return "", err
 	}
+
 	return status, nil
 }
 
@@ -58,24 +48,20 @@ type TextPost struct {
 	Post string
 }
 type TextPostsGetter interface {
-	GetTextPosts(ctx context.Context, storeID string) ([]TextPost, error)
+	GetTextPosts(ctx context.Context) ([]TextPost, error)
 }
 
 type CheckStatusInput struct {
 	Posts []string
 }
 
-type StoreStatus string
+type storeStatus string
 
 const (
-	StoreStatusOpen   StoreStatus = "open"
-	StoreStatusClosed StoreStatus = "closed"
+	StoreStatusOpen   storeStatus = "open"
+	StoreStatusClosed storeStatus = "closed"
 )
 
 type StoreStatusChecker interface {
-	CheckStatus(ctx context.Context, input CheckStatusInput) (StoreStatus, error)
-}
-
-type storeIDGetter interface {
-	GetStoreID(ctx context.Context) (string, error)
+	CheckStatus(ctx context.Context, input CheckStatusInput) (storeStatus, error)
 }
