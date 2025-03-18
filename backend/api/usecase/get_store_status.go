@@ -15,7 +15,7 @@ type getStoreStatus struct {
 	storeStatusChecker StoreStatusChecker
 }
 
-func NewGetStoreStatus(ssc StoreStatusChecker) GetStoreStatus {
+func NewGetStoreStatus(ssc StoreStatusChecker) *getStoreStatus {
 	return &getStoreStatus{
 		storeStatusChecker: ssc,
 	}
