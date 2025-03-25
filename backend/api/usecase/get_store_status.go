@@ -29,8 +29,8 @@ func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) 
 	}
 
 	posts := make([]string, len(textPosts))
-	for i, tweet := range textPosts {
-		posts[i] = tweet.Post
+	for i, textPost := range textPosts {
+		posts[i] = textPost.Post
 	}
 
 	status, err := g.storeStatusChecker.CheckStatus(ctx, CheckStatusInput{
