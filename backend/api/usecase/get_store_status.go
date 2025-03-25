@@ -25,7 +25,8 @@ func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) 
 	textPosts, err := tpg.GetTextPosts(ctx)
 	if err != nil {
 		slog.Error("failed to get text posts")
-		return "", err
+		return StoreStatusClosed, err
+	}
 	}
 
 	posts := make([]string, len(textPosts))
@@ -38,7 +39,7 @@ func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) 
 	})
 	if err != nil {
 		slog.Error("failed to check status")
-		return "", err
+		return StoreStatusClosed, err
 	}
 
 	return status, nil
