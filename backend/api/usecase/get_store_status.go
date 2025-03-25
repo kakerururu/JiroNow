@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 )
 
@@ -21,12 +22,19 @@ func NewGetStoreStatus(ssc StoreStatusChecker) *getStoreStatus {
 	}
 }
 
+var PostNotFoundError = fmt.Errorf("post not found")
+
 func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (StoreStatus, error) {
 	textPosts, err := tpg.GetTextPosts(ctx)
 	if err != nil {
 		slog.Error("failed to get text posts")
 		return StoreStatusClosed, err
 	}
+
+	var PostNotFoundError = fmt.Errorf("post not found")
+	if len(textPosts) == 0 {
+		slog.Error("post not found")
+		return StoreStatusClosed, PostNotFoundError
 	}
 
 	posts := make([]string, len(textPosts))
