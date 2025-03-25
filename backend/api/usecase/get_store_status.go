@@ -31,7 +31,6 @@ func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) 
 		return StoreStatusClosed, err
 	}
 
-	var PostNotFoundError = fmt.Errorf("post not found")
 	if len(textPosts) == 0 {
 		slog.Error("post not found")
 		return StoreStatusClosed, PostNotFoundError
