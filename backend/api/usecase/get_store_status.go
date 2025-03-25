@@ -6,7 +6,7 @@ import (
 )
 
 type GetStoreStatus interface {
-	DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error)
+	DoByTextPost(ctx context.Context, tpg TextPostsGetter) (StoreStatus, error)
 }
 
 var _ GetStoreStatus = (*getStoreStatus)(nil)
@@ -21,7 +21,7 @@ func NewGetStoreStatus(ssc StoreStatusChecker) *getStoreStatus {
 	}
 }
 
-func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error) {
+func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (StoreStatus, error) {
 	textPosts, err := tpg.GetTextPosts(ctx)
 	if err != nil {
 		slog.Error("failed to get text posts")
@@ -55,13 +55,13 @@ type CheckStatusInput struct {
 	Posts []string
 }
 
-type storeStatus string
+type StoreStatus string
 
 const (
-	StoreStatusOpen   storeStatus = "open"
-	StoreStatusClosed storeStatus = "closed"
+	StoreStatusOpen   StoreStatus = "open"
+	StoreStatusClosed StoreStatus = "closed"
 )
 
 type StoreStatusChecker interface {
-	CheckStatus(ctx context.Context, input CheckStatusInput) (storeStatus, error)
+	CheckStatus(ctx context.Context, input CheckStatusInput) (StoreStatus, error)
 }
