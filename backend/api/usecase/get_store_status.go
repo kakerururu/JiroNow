@@ -2,11 +2,12 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 )
 
 type GetStoreStatus interface {
-	DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error)
+	DoByTextPost(ctx context.Context, tpg TextPostsGetter) (StoreStatus, error)
 }
 
 var _ GetStoreStatus = (*getStoreStatus)(nil)
@@ -21,16 +22,23 @@ func NewGetStoreStatus(ssc StoreStatusChecker) *getStoreStatus {
 	}
 }
 
-func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (storeStatus, error) {
+var PostNotFoundError = fmt.Errorf("post not found")
+
+func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) (StoreStatus, error) {
 	textPosts, err := tpg.GetTextPosts(ctx)
 	if err != nil {
 		slog.Error("failed to get text posts")
-		return "", err
+		return StoreStatusClosed, err
+	}
+
+	if len(textPosts) == 0 {
+		slog.Error("post not found")
+		return StoreStatusClosed, PostNotFoundError
 	}
 
 	posts := make([]string, len(textPosts))
-	for i, tweet := range textPosts {
-		posts[i] = tweet.Post
+	for i, textPost := range textPosts {
+		posts[i] = textPost.Post
 	}
 
 	status, err := g.storeStatusChecker.CheckStatus(ctx, CheckStatusInput{
@@ -38,7 +46,7 @@ func (g *getStoreStatus) DoByTextPost(ctx context.Context, tpg TextPostsGetter) 
 	})
 	if err != nil {
 		slog.Error("failed to check status")
-		return "", err
+		return StoreStatusClosed, err
 	}
 
 	return status, nil
@@ -55,13 +63,13 @@ type CheckStatusInput struct {
 	Posts []string
 }
 
-type storeStatus string
+type StoreStatus string
 
 const (
-	StoreStatusOpen   storeStatus = "open"
-	StoreStatusClosed storeStatus = "closed"
+	StoreStatusOpen   StoreStatus = "open"
+	StoreStatusClosed StoreStatus = "closed"
 )
 
 type StoreStatusChecker interface {
-	CheckStatus(ctx context.Context, input CheckStatusInput) (storeStatus, error)
+	CheckStatus(ctx context.Context, input CheckStatusInput) (StoreStatus, error)
 }
