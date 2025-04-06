@@ -2,7 +2,6 @@ package x
 
 import (
 	"JiroNow/usecase"
-	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -22,27 +21,24 @@ func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) 
 }
 
 func TestXClient_GetXPosts(t *testing.T) {
+
+	baseURL := url.URL{Scheme: "https", Host: "api.twitter.com"}
+	token := "dummy_token"
+	accountID := "test_account"
+	ctx := t.Context()
+
 	type fields struct {
-		bearerToken string
-		baseURL     url.URL
-		httpClient  *http.Client
-	}
-	type args struct {
-		ctx       context.Context
-		accountID string
+		httpClient *http.Client
 	}
 	tests := []struct {
 		name    string
 		fields  fields
-		args    args
 		want    []usecase.TextPost
 		wantErr bool
 	}{
 		{
 			name: "正常系_ポストをエラー無く1個以上取得し、その内容を返す",
 			fields: fields{
-				bearerToken: "test_token",
-				baseURL:     url.URL{Scheme: "https", Host: "api.twitter.com"},
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
@@ -59,10 +55,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 					},
 				},
 			},
-			args: args{
-				ctx:       t.Context(),
-				accountID: "test_account",
-			},
+
 			want: []usecase.TextPost{
 				{Post: "ポスト1"},
 				{Post: "ポスト2"},
@@ -73,11 +66,11 @@ func TestXClient_GetXPosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			x := &XClient{
-				bearerToken: tt.fields.bearerToken,
-				baseURL:     tt.fields.baseURL,
+				bearerToken: token,
+				baseURL:     baseURL,
 				httpClient:  tt.fields.httpClient,
 			}
-			got, err := x.GetXPosts(tt.args.ctx, tt.args.accountID)
+			got, err := x.GetXPosts(ctx, accountID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("XClient.GetXPosts() error = %v, wantErr %v", err, tt.wantErr)
 				return
