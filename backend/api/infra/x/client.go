@@ -4,6 +4,7 @@ import (
 	"JiroNow/usecase"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -30,6 +31,8 @@ type twitterRecentResponse struct {
 	} `json:"data"`
 }
 
+var Non200Error = fmt.Errorf("non-200 response from X API")
+
 func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.TextPost, error) {
 	//URLの構築
 	endpoint := x.baseURL
@@ -55,7 +58,7 @@ func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.Te
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		slog.Error("Twitter API returned non-200", "status", resp.StatusCode, "body", string(body))
-		return nil, err
+		return nil, Non200Error
 	}
 	defer resp.Body.Close()
 

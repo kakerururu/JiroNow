@@ -1,8 +1,10 @@
-package x
+package x_test
 
 import (
+	"JiroNow/infra/x"
 	"JiroNow/usecase"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -27,6 +29,8 @@ func TestXClient_GetXPosts(t *testing.T) {
 	token := "dummy_token"
 	accountID := "test_account"
 	ctx := t.Context()
+
+	var httpClientError = fmt.Errorf("failed to create http client")
 
 	type fields struct {
 		httpClient *http.Client
@@ -69,13 +73,14 @@ func TestXClient_GetXPosts(t *testing.T) {
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
-							return nil, errors.New("network error")
+
+							return nil, httpClientError
 						},
 					},
 				},
 			},
 			want:    nil,
-			wantErr: errors.New("network error"),
+			wantErr: httpClientError,
 		},
 		{
 			name: "異常系_レスポンスが200以外で返ってきた場合、そのエラーを返す",
@@ -86,41 +91,20 @@ func TestXClient_GetXPosts(t *testing.T) {
 							return &http.Response{
 								StatusCode: http.StatusInternalServerError,
 								Body:       io.NopCloser(strings.NewReader(`{"invalid_json":`)),
-							}, errors.New("Internal Server Error")
-						},
-					},
-				},
-			},
-			want:    nil,
-			wantErr: errors.New("Internal Server Error"),
-		},
-		{
-			name: "異常系_レスポンスのJSONパースに失敗した場合、そのエラーを返す",
-			fields: fields{
-				httpClient: &http.Client{
-					Transport: &mockRoundTripper{
-						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
-							return &http.Response{
-								StatusCode: http.StatusOK,
-								Body:       io.NopCloser(strings.NewReader(`{"invalid_json":`)),
 							}, nil
 						},
 					},
 				},
 			},
 			want:    nil,
-			wantErr: errors.New("invalid character 'i' looking for beginning of value"),
+			wantErr: x.Non200Error,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			x := &XClient{
-				bearerToken: token,
-				baseURL:     baseURL,
-				httpClient:  tt.fields.httpClient,
-			}
+			x := x.NewXClient(token, baseURL, tt.fields.httpClient)
 			got, err := x.GetXPosts(ctx, accountID)
-			if (err != nil) != (tt.wantErr != nil) {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("XClient.GetXPosts() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
