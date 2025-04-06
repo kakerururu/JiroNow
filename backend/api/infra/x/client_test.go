@@ -2,6 +2,7 @@ package x
 
 import (
 	"JiroNow/usecase"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -61,6 +62,54 @@ func TestXClient_GetXPosts(t *testing.T) {
 				{Post: "ポスト2"},
 			},
 			wantErr: false,
+		},
+		{
+			name: "異常系_HTTPクライアントがエラーを返し、そのエラーを返す",
+			fields: fields{
+				httpClient: &http.Client{
+					Transport: &mockRoundTripper{
+						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
+							return nil, errors.New("network error")
+						},
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "異常系_レスポンスが200以外で、そのエラーを返す",
+			fields: fields{
+				httpClient: &http.Client{
+					Transport: &mockRoundTripper{
+						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
+							return &http.Response{
+								StatusCode: http.StatusInternalServerError,
+								Body:       io.NopCloser(strings.NewReader(`{"invalid_json":`)),
+							}, errors.New("Internal Server Error")
+						},
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "異常系_レスポンスのJSONパースに失敗し、そのエラーを返す",
+			fields: fields{
+				httpClient: &http.Client{
+					Transport: &mockRoundTripper{
+						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
+							return &http.Response{
+								StatusCode: http.StatusOK,
+								Body:       io.NopCloser(strings.NewReader(`{"invalid_json":`)),
+							}, nil
+						},
+					},
+				},
+			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
