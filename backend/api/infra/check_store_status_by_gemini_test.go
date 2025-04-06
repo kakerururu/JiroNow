@@ -46,7 +46,6 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 			fields: fields{
 				googleApiKey: "test",
 				baseURL:      url.URL{Scheme: "http", Host: "example.com"},
-				//
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
