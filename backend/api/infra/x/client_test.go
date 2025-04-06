@@ -78,7 +78,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 			wantErr: errors.New("network error"),
 		},
 		{
-			name: "異常系_レスポンスが200以外で、そのエラーを返す",
+			name: "異常系_レスポンスが200以外で返ってきた場合、そのエラーを返す",
 			fields: fields{
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
@@ -95,7 +95,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 			wantErr: errors.New("Internal Server Error"),
 		},
 		{
-			name: "異常系_レスポンスのJSONパースに失敗し、そのエラーを返す",
+			name: "異常系_レスポンスのJSONパースに失敗した場合、そのエラーを返す",
 			fields: fields{
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
