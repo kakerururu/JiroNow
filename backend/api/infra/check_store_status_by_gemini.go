@@ -35,7 +35,6 @@ func NewgeminiClient(key string, baseURL url.URL, hc *http.Client) *geminiClient
 func (s *geminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
 
 	endpoint := s.baseURL
-	endpoint.Path = "check_status"
 	query := endpoint.Query()
 	query.Set("key", s.googleApiKey)
 	endpoint.RawQuery = query.Encode()
