@@ -60,7 +60,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:       context.Background(),
+				ctx:       t.Context(),
 				accountID: "test_account",
 			},
 			want: []usecase.TextPost{
