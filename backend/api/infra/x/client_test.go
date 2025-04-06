@@ -11,6 +11,8 @@ import (
 	"testing"
 )
 
+var _ http.RoundTripper = (*mockRoundTripper)(nil)
+
 type mockRoundTripper struct {
 	RoundTripFunc func(req *http.Request) (*http.Response, error)
 }
