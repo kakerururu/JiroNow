@@ -25,11 +25,9 @@ func NewXClient(bearerToken string, baseURL url.URL, hc *http.Client) *XClient {
 }
 
 type twitterRecentResponse struct {
-	Data []TweetData `json:"data"`
-}
-
-type TweetData struct {
-	Text string `json:"text"`
+	Data []struct {
+		Text string `json:"text"`
+	} `json:"data"`
 }
 
 func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.TextPost, error) {
