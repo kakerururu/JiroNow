@@ -35,10 +35,10 @@ func TestXClient_GetXPosts(t *testing.T) {
 		name    string
 		fields  fields
 		want    []usecase.TextPost
-		wantErr bool
+		wantErr error
 	}{
 		{
-			name: "正常系_ポストをエラー無く1個以上取得し、その内容を返す",
+			name: "正常系_ポストをエラー無く1個以上取得出来た場合、その内容を返す",
 			fields: fields{
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
@@ -61,10 +61,10 @@ func TestXClient_GetXPosts(t *testing.T) {
 				{Post: "ポスト1"},
 				{Post: "ポスト2"},
 			},
-			wantErr: false,
+			wantErr: nil,
 		},
 		{
-			name: "異常系_HTTPクライアントがエラーを返し、そのエラーを返す",
+			name: "異常系_HTTPクライアントがエラーを返した場合、そのエラーを返す",
 			fields: fields{
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
@@ -75,7 +75,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: true,
+			wantErr: errors.New("network error"),
 		},
 		{
 			name: "異常系_レスポンスが200以外で、そのエラーを返す",
@@ -92,7 +92,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: true,
+			wantErr: errors.New("Internal Server Error"),
 		},
 		{
 			name: "異常系_レスポンスのJSONパースに失敗し、そのエラーを返す",
@@ -109,7 +109,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: true,
+			wantErr: errors.New("invalid character 'i' looking for beginning of value"),
 		},
 	}
 	for _, tt := range tests {
@@ -120,7 +120,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 				httpClient:  tt.fields.httpClient,
 			}
 			got, err := x.GetXPosts(ctx, accountID)
-			if (err != nil) != tt.wantErr {
+			if (err != nil) != (tt.wantErr != nil) {
 				t.Errorf("XClient.GetXPosts() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
