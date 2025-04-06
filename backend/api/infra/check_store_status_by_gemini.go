@@ -1,24 +1,39 @@
 package infra
 
 import (
-	"JiroNow/infra/gemini"
 	"JiroNow/usecase"
 	"context"
+	"net/http"
+	"net/url"
 )
 
 var _ usecase.StoreStatusChecker = (*StoreStatusCheckerByGemini)(nil)
 
 type StoreStatusCheckerByGemini struct {
-	geminiClinet gemini.GeminiClient
+	geminiClinet GeminiClient
 }
 
-func NewStoreStatusCheckerByGemini(geminiClinet gemini.GeminiClient) *StoreStatusCheckerByGemini {
+func NewStoreStatusCheckerByGemini(geminiClinet GeminiClient) *StoreStatusCheckerByGemini {
 	return &StoreStatusCheckerByGemini{
 		geminiClinet: geminiClinet,
 	}
 }
 
+type GeminiClient struct {
+	googleApiKey string
+	baseURL      url.URL
+	httpClient   *http.Client
+}
+
+func NewGeminiClient(key string, baseURL url.URL, hc *http.Client) *GeminiClient {
+	return &GeminiClient{
+		googleApiKey: key,
+		baseURL:      baseURL,
+		httpClient:   hc,
+	}
+}
+
 func (s *StoreStatusCheckerByGemini) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
-	//ここに実装を書く
+
 	return usecase.StoreStatusClosed, nil // Placeholder implementation
 }
