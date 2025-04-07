@@ -86,7 +86,7 @@ func Test_getStoreStatus_DoByTextPost(t *testing.T) {
 				}
 			}(),
 		}, {
-			name:    "異常系_投稿をエラー無く取得できたが、投稿が0件だったときエラーを返す",
+			name:    "異常系_投稿をエラー無く取得できたが投稿が0件だったとき、PostNotFoundErrorを返す",
 			want:    usecase.StoreStatusClosed,
 			wantErr: usecase.PostNotFoundError,
 			mocks: func() mocks {
