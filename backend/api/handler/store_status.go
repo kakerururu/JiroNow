@@ -37,6 +37,19 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
 	// ここにyamlの定義に合うようなエラーハンドリングを追加したいけど一旦鴨野に相談
 
+	switch {
+	case err == infra.GeminiNotJudgeError:
+		return &oas.UnprocessableStoreStatusResponse{
+			Message: oas.OptString{
+				Value: "can't judge",
+				Set:   true,
+			},
+		}, nil
+
+	case err != nil:
+		return nil, h.NewError(ctx, err)
+	}
+
 	switch status {
 	case usecase.StoreStatusOpen:
 		return &oas.GetStoreStatusResponse{
