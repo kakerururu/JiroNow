@@ -1,36 +1,23 @@
 package handler
 
 import (
-	"JiroNow/handler/env"
 	"JiroNow/infra"
 	"JiroNow/infra/x"
 	"JiroNow/oas"
 	"JiroNow/usecase"
 	"context"
 	"net/http"
-	"net/url"
+	"os"
 )
 
 func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetParams) (oas.StoreStatusGetRes, error) {
-	var config = env.NewEnv()
-	xBearerToken := config.XBearerToken
-	xBaseURL := url.URL{
-		Scheme: "https",
-		Host:   config.XHostURL,
-	}
-	xClient := x.NewXClient(xBearerToken, xBaseURL, http.DefaultClient)
+	xBearerToken := os.Getenv("X_BEARER_TOKEN")
+	xClient := x.NewXClient(xBearerToken, http.DefaultClient)
 	xPostGetter := infra.NewXPostGetter(params.XAccountId, *xClient)
 
-	geminiToken := config.GeminiToken
-	geminiBaseURL := url.URL{
-		Scheme: "https",
-		Host:   config.GeminiHostURL,
-		Path:   config.GeminiPathURL,
-	}
-
+	geminiToken := os.Getenv("GEMINI_API_KEY")
 	storeStatusChecker := infra.NewGeminiClientRetry(infra.NewgeminiClient(
 		geminiToken,
-		geminiBaseURL,
 		http.DefaultClient,
 	))
 
