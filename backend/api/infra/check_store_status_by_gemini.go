@@ -17,24 +17,27 @@ var _ usecase.StoreStatusChecker = (*geminiClient)(nil)
 
 type geminiClient struct {
 	googleApiKey string
-	baseURL      url.URL
 	httpClient   *http.Client
 }
 
 var Non200Error = fmt.Errorf("non-200 response from API")
 var GeminiNotJudgeError = fmt.Errorf("Gemini is not able to judge the status")
 
-func NewgeminiClient(key string, baseURL url.URL, hc *http.Client) *geminiClient {
+func NewgeminiClient(key string, hc *http.Client) *geminiClient {
 	return &geminiClient{
 		googleApiKey: key,
-		baseURL:      baseURL,
 		httpClient:   hc,
 	}
 }
 
 func (s *geminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
 
-	endpoint := s.baseURL
+	endpoint := url.URL{
+		Scheme: "https",
+		Host:   "generativelanguage.googleapis.com",
+		Path:   "v1beta/models/gemini-2.0-flash:generateContent",
+	}
+
 	query := endpoint.Query()
 	query.Set("key", s.googleApiKey)
 	endpoint.RawQuery = query.Encode()

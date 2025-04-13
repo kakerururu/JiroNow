@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -27,7 +26,6 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 
 	type fields struct {
 		googleApiKey string
-		baseURL      url.URL
 		httpClient   *http.Client
 	}
 	type args struct {
@@ -45,7 +43,6 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 			name: "正常系_エラーなく営業状況を取得できる",
 			fields: fields{
 				googleApiKey: "test",
-				baseURL:      url.URL{Scheme: "http", Host: "example.com"},
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
@@ -81,7 +78,6 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 			name: "異常系_HTTPステータスコードが200以外の場合",
 			fields: fields{
 				googleApiKey: "test",
-				baseURL:      url.URL{Scheme: "http", Host: "example.com"},
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
@@ -107,7 +103,6 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 			name: "異常系_HTTPクライアントがエラーを返した場合",
 			fields: fields{
 				googleApiKey: "test",
-				baseURL:      url.URL{Scheme: "http", Host: "example.com"},
 				httpClient: &http.Client{
 					Transport: &mockRoundTripper{
 						RoundTripFunc: func(req *http.Request) (*http.Response, error) {
@@ -128,7 +123,7 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := infra.NewgeminiClient(tt.fields.googleApiKey, tt.fields.baseURL, tt.fields.httpClient)
+			s := infra.NewgeminiClient(tt.fields.googleApiKey, tt.fields.httpClient)
 			got, err := s.CheckStatus(tt.args.ctx, tt.args.input)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("GeminiClient.CheckStatus() error = %v, wantErr %v", err, tt.wantErr)
