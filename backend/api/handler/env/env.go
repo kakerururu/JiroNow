@@ -1,28 +1,26 @@
 package env
 
-import "os"
+import (
+	"log/slog"
+	"os"
+)
 
-type Config struct {
-	XBearerToken  string
-	GeminiToken   string
-	XHostURL      string
-	GeminiHostURL string
-	GeminiPathURL string
+type env struct {
+	XBearerToken string
+	GeminiToken  string
 }
 
-func NewEnv() *Config {
-	return &Config{
-		XBearerToken:  getEnv("X_BEARER_TOKEN", ""),
-		GeminiToken:   getEnv("GEMINI_TOKEN", ""),
-		XHostURL:      getEnv("X_HOST_URL", ""),
-		GeminiHostURL: getEnv("GEMINI_HOST_URL", ""),
-		GeminiPathURL: getEnv("GEMINI_PATH_URL", ""),
+func NewEnv() *env {
+	xBearreToken, ok := os.LookupEnv("X_BEARER_TOKEN")
+	if !ok {
+		slog.Error("X_BEARER_TOKEN not set")
 	}
-}
-
-func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
+	geminiToken, ok := os.LookupEnv("GEMINI_API_KEY")
+	if !ok {
+		slog.Error("GEMINI_API_KEY not set")
 	}
-	return defaultValue
+	return &env{
+		XBearerToken: xBearreToken,
+		GeminiToken:  geminiToken,
+	}
 }
