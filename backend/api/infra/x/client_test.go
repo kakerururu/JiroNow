@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -24,8 +23,6 @@ func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) 
 }
 
 func TestXClient_GetXPosts(t *testing.T) {
-
-	baseURL := url.URL{Scheme: "https", Host: "api.twitter.com"}
 	token := "dummy_token"
 	accountID := "test_account"
 	ctx := t.Context()
@@ -102,7 +99,7 @@ func TestXClient_GetXPosts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			x := x.NewXClient(token, baseURL, tt.fields.httpClient)
+			x := x.NewXClient(token, tt.fields.httpClient)
 			got, err := x.GetXPosts(ctx, accountID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("XClient.GetXPosts() error = %v, wantErr %v", err, tt.wantErr)
