@@ -27,10 +27,7 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 	switch {
 	case err == infra.GeminiNotJudgeError:
 		return &oas.UnprocessableStoreStatusResponse{
-			Message: oas.OptString{
-				Value: "can't judge",
-				Set:   true,
-			},
+			Message: "Gemini not judge error",
 		}, nil
 
 	case err != nil:
@@ -40,11 +37,11 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 	switch status {
 	case usecase.StoreStatusOpen:
 		return &oas.GetStoreStatusResponse{
-			Status: oas.NewOptGetStoreStatusResponseStatus(oas.GetStoreStatusResponseStatusOpen),
+			Status: oas.GetStoreStatusResponseStatusOpen,
 		}, nil
 	case usecase.StoreStatusClosed:
 		return &oas.GetStoreStatusResponse{
-			Status: oas.NewOptGetStoreStatusResponseStatus(oas.GetStoreStatusResponseStatusClosed),
+			Status: oas.GetStoreStatusResponseStatusClosed,
 		}, nil
 	default:
 		return nil, h.NewError(ctx, err)

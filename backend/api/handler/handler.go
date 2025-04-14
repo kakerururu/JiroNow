@@ -28,10 +28,7 @@ func (*handler) NewError(ctx context.Context, err error) *oas.InternalServerErro
 	return &oas.InternalServerErrorResponseStatusCode{
 		StatusCode: 500,
 		Response: oas.InternalServerErrorResponse{
-			Message: oas.OptString{
-				Value: err.Error(),
-				Set:   false,
-			},
+			Message: "internal server error",
 		},
 	}
 }
