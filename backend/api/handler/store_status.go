@@ -15,12 +15,12 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 	xPostGetter := infra.NewXPostGetter(params.XAccountId, *xClient)
 
 	geminiToken := h.GeminiToken
-	storeStatusChecker := infra.NewGeminiClientRetry(infra.NewgeminiClient(
+	GeminiClient := infra.NewGeminiClientRetry(infra.NewgeminiClient(
 		geminiToken,
 		http.DefaultClient,
 	))
 
-	uc := usecase.NewGetStoreStatus(storeStatusChecker)
+	uc := usecase.NewGetStoreStatus(GeminiClient)
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
 
 	switch {
