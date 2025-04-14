@@ -13,12 +13,18 @@ import (
 
 type XClient struct {
 	bearerToken string
+	baseURL     url.URL
 	httpClient  *http.Client
 }
 
 func NewXClient(bearerToken string, hc *http.Client) *XClient {
+	baseURL := url.URL{
+		Scheme: "https",
+		Host:   "api.twitter.com",
+	}
 	return &XClient{
 		bearerToken: bearerToken,
+		baseURL:     baseURL,
 		httpClient:  hc,
 	}
 }
@@ -33,14 +39,9 @@ var Non200Error = fmt.Errorf("non-200 response from X API")
 
 func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.TextPost, error) {
 	//URLの構築
-	endpoint := url.URL{
-		Scheme: "https",
-		Host:   "api.twitter.com",
-		Path:   "2/tweets/search/recent",
-	}
-	query := endpoint.Query()
-	query.Set("query", "from:"+accountID)
-	endpoint.RawQuery = query.Encode()
+	endpoint := x.baseURL
+	endpoint.Path = "/2/tweets/search/recent"
+	endpoint.RawQuery = "query=from:" + accountID
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
