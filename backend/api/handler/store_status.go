@@ -10,7 +10,8 @@ import (
 
 func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetParams) (oas.StoreStatusGetRes, error) {
 	xPostGetter := infra.NewXPostGetter(params.XAccountId, *h.xClient)
-	uc := usecase.NewGetStoreStatus(h.geminiClient)
+
+	uc := usecase.NewGetStoreStatus(infra.NewGeminiClientRetry(h.geminiClient))
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
 
 	switch err {
