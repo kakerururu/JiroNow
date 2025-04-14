@@ -2,15 +2,17 @@ package handler
 
 import (
 	"JiroNow/handler/env"
+	"JiroNow/infra/x"
 	"JiroNow/oas"
 	"context"
+	"net/http"
 )
 
 var _ oas.Handler = (*handler)(nil)
 
 type handler struct {
-	XBearerToken string
-	GeminiToken  string
+	xClient     *x.XClient
+	GeminiToken string
 }
 
 func NewHandler() (*handler, error) {
@@ -19,8 +21,8 @@ func NewHandler() (*handler, error) {
 		return nil, err
 	}
 	return &handler{
-		XBearerToken: envs.XBearerToken,
-		GeminiToken:  envs.GeminiToken,
+		xClient:     x.NewXClient(envs.XBearerToken, http.DefaultClient),
+		GeminiToken: envs.GeminiToken,
 	}, nil
 }
 

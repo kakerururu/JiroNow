@@ -10,9 +10,7 @@ import (
 )
 
 func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetParams) (oas.StoreStatusGetRes, error) {
-	xBearerToken := h.XBearerToken
-	xClient := x.NewXClient(xBearerToken, http.DefaultClient)
-	xPostGetter := infra.NewXPostGetter(params.XAccountId, *xClient)
+	xPostGetter := infra.NewXPostGetter(params.XAccountId, *h.xClient)
 
 	geminiToken := h.GeminiToken
 	GeminiClient := infra.NewGeminiClientRetry(infra.NewgeminiClient(
