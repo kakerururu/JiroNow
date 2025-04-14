@@ -21,9 +21,13 @@
                 "saoudrizwan.claude-dev",
                 "eamodio.gitlens",
                 "42Crunch.vscode-openapi",
-                "redjue.git-commit-plugin"
+                "redjue.git-commit-plugin",
+                "HashiCorp.terraform"
             ]
         }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/terraform:1": {}
     }
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},

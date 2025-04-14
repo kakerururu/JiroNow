@@ -13,32 +13,32 @@ func (s *InternalServerErrorResponseStatusCode) Error() string {
 }
 
 type AccountNotFoundResponse struct {
-	Message OptString `json:"message"`
+	Message string `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *AccountNotFoundResponse) GetMessage() OptString {
+func (s *AccountNotFoundResponse) GetMessage() string {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *AccountNotFoundResponse) SetMessage(val OptString) {
+func (s *AccountNotFoundResponse) SetMessage(val string) {
 	s.Message = val
 }
 
 func (*AccountNotFoundResponse) storeStatusGetRes() {}
 
 type GetStoreStatusResponse struct {
-	Status OptGetStoreStatusResponseStatus `json:"status"`
+	Status GetStoreStatusResponseStatus `json:"status"`
 }
 
 // GetStatus returns the value of Status.
-func (s *GetStoreStatusResponse) GetStatus() OptGetStoreStatusResponseStatus {
+func (s *GetStoreStatusResponse) GetStatus() GetStoreStatusResponseStatus {
 	return s.Status
 }
 
 // SetStatus sets the value of Status.
-func (s *GetStoreStatusResponse) SetStatus(val OptGetStoreStatusResponseStatus) {
+func (s *GetStoreStatusResponse) SetStatus(val GetStoreStatusResponseStatus) {
 	s.Status = val
 }
 
@@ -86,16 +86,16 @@ func (s *GetStoreStatusResponseStatus) UnmarshalText(data []byte) error {
 }
 
 type InternalServerErrorResponse struct {
-	Message OptString `json:"message"`
+	Message string `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *InternalServerErrorResponse) GetMessage() OptString {
+func (s *InternalServerErrorResponse) GetMessage() string {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *InternalServerErrorResponse) SetMessage(val OptString) {
+func (s *InternalServerErrorResponse) SetMessage(val string) {
 	s.Message = val
 }
 
@@ -125,109 +125,17 @@ func (s *InternalServerErrorResponseStatusCode) SetResponse(val InternalServerEr
 	s.Response = val
 }
 
-// NewOptGetStoreStatusResponseStatus returns new OptGetStoreStatusResponseStatus with value set to v.
-func NewOptGetStoreStatusResponseStatus(v GetStoreStatusResponseStatus) OptGetStoreStatusResponseStatus {
-	return OptGetStoreStatusResponseStatus{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetStoreStatusResponseStatus is optional GetStoreStatusResponseStatus.
-type OptGetStoreStatusResponseStatus struct {
-	Value GetStoreStatusResponseStatus
-	Set   bool
-}
-
-// IsSet returns true if OptGetStoreStatusResponseStatus was set.
-func (o OptGetStoreStatusResponseStatus) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetStoreStatusResponseStatus) Reset() {
-	var v GetStoreStatusResponseStatus
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetStoreStatusResponseStatus) SetTo(v GetStoreStatusResponseStatus) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetStoreStatusResponseStatus) Get() (v GetStoreStatusResponseStatus, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetStoreStatusResponseStatus) Or(d GetStoreStatusResponseStatus) GetStoreStatusResponseStatus {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptString is optional string.
-type OptString struct {
-	Value string
-	Set   bool
-}
-
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 type UnprocessableStoreStatusResponse struct {
-	Message OptString `json:"message"`
+	Message string `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *UnprocessableStoreStatusResponse) GetMessage() OptString {
+func (s *UnprocessableStoreStatusResponse) GetMessage() string {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *UnprocessableStoreStatusResponse) SetMessage(val OptString) {
+func (s *UnprocessableStoreStatusResponse) SetMessage(val string) {
 	s.Message = val
 }
 

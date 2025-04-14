@@ -17,7 +17,11 @@ type XClient struct {
 	httpClient  *http.Client
 }
 
-func NewXClient(bearerToken string, baseURL url.URL, hc *http.Client) *XClient {
+func NewXClient(bearerToken string, hc *http.Client) *XClient {
+	baseURL := url.URL{
+		Scheme: "https",
+		Host:   "api.twitter.com",
+	}
 	return &XClient{
 		bearerToken: bearerToken,
 		baseURL:     baseURL,
@@ -32,14 +36,13 @@ type twitterRecentResponse struct {
 }
 
 var Non200Error = fmt.Errorf("non-200 response from X API")
+var AccountNotFoundError = fmt.Errorf("account not found")
 
 func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.TextPost, error) {
 	//URLの構築
 	endpoint := x.baseURL
-	endpoint.Path = "tweets/search/recent"
-	query := endpoint.Query()
-	query.Set("query", "from:"+accountID)
-	endpoint.RawQuery = query.Encode()
+	endpoint.Path = "/2/tweets/search/recent"
+	endpoint.RawQuery = "query=from:" + accountID
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
 	if err != nil {
@@ -54,13 +57,19 @@ func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.Te
 		slog.Error("failed to send request", "err", err)
 		return nil, err
 	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusBadRequest {
+		body, _ := io.ReadAll(resp.Body)
+		slog.Error("Twitter API returned 400 Bad Request", "status", resp.StatusCode, "body", string(body))
+		return nil, AccountNotFoundError
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		slog.Error("Twitter API returned non-200", "status", resp.StatusCode, "body", string(body))
 		return nil, Non200Error
 	}
-	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

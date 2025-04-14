@@ -13,31 +13,33 @@ import (
 	"strings"
 )
 
-var _ usecase.StoreStatusChecker = (*geminiClient)(nil)
+var _ usecase.StoreStatusChecker = (*GeminiClient)(nil)
 
-type geminiClient struct {
+type GeminiClient struct {
 	googleApiKey string
-	baseURL      url.URL
+	endpoint     url.URL
 	httpClient   *http.Client
 }
 
 var Non200Error = fmt.Errorf("non-200 response from API")
-var GeminiNoBrainError = fmt.Errorf("Gemini No Brain Error")
+var GeminiNotJudgeError = fmt.Errorf("Gemini is not able to judge the status")
 
-func NewgeminiClient(key string, baseURL url.URL, hc *http.Client) *geminiClient {
-	return &geminiClient{
+func NewgeminiClient(key string, hc *http.Client) *GeminiClient {
+	endpoint := url.URL{
+		Scheme: "https",
+		Host:   "generativelanguage.googleapis.com",
+		Path:   "v1beta/models/gemini-2.0-flash:generateContent",
+	}
+	return &GeminiClient{
 		googleApiKey: key,
-		baseURL:      baseURL,
+		endpoint:     endpoint,
 		httpClient:   hc,
 	}
 }
 
-func (s *geminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
-
-	endpoint := s.baseURL
-	query := endpoint.Query()
-	query.Set("key", s.googleApiKey)
-	endpoint.RawQuery = query.Encode()
+func (s *GeminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
+	endpoint := s.endpoint
+	endpoint.RawQuery = "key=" + s.googleApiKey
 
 	prompt := map[string]interface{}{
 		"contents": []map[string]interface{}{
@@ -97,11 +99,11 @@ func (s *geminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatu
 		return usecase.StoreStatusOpen, nil
 	}
 	if statusText == "closed" {
-	return usecase.StoreStatusClosed, nil
-}
+		return usecase.StoreStatusClosed, nil
+	}
 	slog.Error("invalid status text: " + statusText)
 
-	return usecase.StoreStatusClosed, GeminiNoBrainError
+	return usecase.StoreStatusClosed, GeminiNotJudgeError
 }
 
 var _ usecase.StoreStatusChecker = (*geminiClientRetry)(nil)
@@ -123,7 +125,7 @@ func (g *geminiClientRetry) CheckStatus(ctx context.Context, input usecase.Check
 
 	for i := 0; i < maxRetries; i++ {
 		status, err = g.geminiClient.CheckStatus(ctx, input)
-		if err == GeminiNoBrainError {
+		if err == GeminiNotJudgeError {
 			slog.Info("retrying due to Gemini No Brain Error")
 			continue
 		}
@@ -132,4 +134,3 @@ func (g *geminiClientRetry) CheckStatus(ctx context.Context, input usecase.Check
 
 	return usecase.StoreStatusClosed, err
 }
-
