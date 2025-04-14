@@ -22,14 +22,16 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 
 	uc := usecase.NewGetStoreStatus(storeStatusChecker)
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
-	// ここにyamlの定義に合うようなエラーハンドリングを追加したいけど一旦鴨野に相談
 
 	switch {
 	case err == infra.GeminiNotJudgeError:
 		return &oas.UnprocessableStoreStatusResponse{
 			Message: "Gemini not judge error",
 		}, nil
-
+	case err == x.AccountNotFoundError:
+		return &oas.AccountNotFoundResponse{
+			Message: "Account not found",
+		}, nil
 	case err != nil:
 		return nil, h.NewError(ctx, err)
 	}

@@ -36,6 +36,7 @@ type twitterRecentResponse struct {
 }
 
 var Non200Error = fmt.Errorf("non-200 response from X API")
+var AccountNotFoundError = fmt.Errorf("account not found")
 
 func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.TextPost, error) {
 	//URLの構築
@@ -57,7 +58,11 @@ func (x *XClient) GetXPosts(ctx context.Context, accountID string) ([]usecase.Te
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode == http.StatusBadRequest {
+		body, _ := io.ReadAll(resp.Body)
+		slog.Error("Twitter API returned 400 Bad Request", "status", resp.StatusCode, "body", string(body))
+		return nil, AccountNotFoundError
+	} else if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		slog.Error("Twitter API returned non-200", "status", resp.StatusCode, "body", string(body))
 		return nil, Non200Error
