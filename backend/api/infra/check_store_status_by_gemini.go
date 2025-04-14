@@ -38,7 +38,6 @@ func NewgeminiClient(key string, hc *http.Client) *geminiClient {
 }
 
 func (s *geminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
-	// https: //generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAisMmlx3Q9s0q4MhRbvpukNTVAa-AhOOk
 	endpoint := s.endpoint
 	endpoint.RawQuery = "key=" + s.googleApiKey
 

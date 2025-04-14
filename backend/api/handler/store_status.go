@@ -23,16 +23,17 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 	uc := usecase.NewGetStoreStatus(GeminiClient)
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
 
-	switch {
-	case err == infra.GeminiNotJudgeError:
+	switch err {
+	case infra.GeminiNotJudgeError:
 		return &oas.UnprocessableStoreStatusResponse{
 			Message: "Gemini not judge error",
 		}, nil
-	case err == x.AccountNotFoundError:
+	case x.AccountNotFoundError:
 		return &oas.AccountNotFoundResponse{
 			Message: "Account not found",
 		}, nil
-	case err != nil:
+	case nil:
+	default:
 		return nil, h.NewError(ctx, err)
 	}
 
