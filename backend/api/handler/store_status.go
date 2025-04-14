@@ -6,19 +6,11 @@ import (
 	"JiroNow/oas"
 	"JiroNow/usecase"
 	"context"
-	"net/http"
 )
 
 func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetParams) (oas.StoreStatusGetRes, error) {
 	xPostGetter := infra.NewXPostGetter(params.XAccountId, *h.xClient)
-
-	geminiToken := h.GeminiToken
-	GeminiClient := infra.NewGeminiClientRetry(infra.NewgeminiClient(
-		geminiToken,
-		http.DefaultClient,
-	))
-
-	uc := usecase.NewGetStoreStatus(GeminiClient)
+	uc := usecase.NewGetStoreStatus(h.geminiClient)
 	status, err := uc.DoByTextPost(ctx, xPostGetter)
 
 	switch err {

@@ -2,8 +2,10 @@ package handler
 
 import (
 	"JiroNow/handler/internal/env"
+	"JiroNow/infra"
 	"JiroNow/infra/x"
 	"JiroNow/oas"
+	"JiroNow/usecase"
 	"context"
 	"net/http"
 )
@@ -11,8 +13,8 @@ import (
 var _ oas.Handler = (*handler)(nil)
 
 type handler struct {
-	xClient     *x.XClient
-	GeminiToken string
+	xClient      *x.XClient
+	geminiClient usecase.StoreStatusChecker
 }
 
 func NewHandler() (*handler, error) {
@@ -20,9 +22,13 @@ func NewHandler() (*handler, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &handler{
-		xClient:     x.NewXClient(envs.XBearerToken, http.DefaultClient),
-		GeminiToken: envs.GeminiToken,
+		xClient: x.NewXClient(envs.XBearerToken, http.DefaultClient),
+		geminiClient: infra.NewGeminiClientRetry(infra.NewgeminiClient(
+			envs.GeminiToken,
+			http.DefaultClient,
+		)),
 	}, nil
 }
 
