@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"JiroNow/handler/env"
+	"JiroNow/handler/internal/env"
 	"JiroNow/infra/x"
 	"JiroNow/oas"
 	"context"
