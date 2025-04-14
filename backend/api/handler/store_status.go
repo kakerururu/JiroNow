@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"JiroNow/handler/env"
 	"JiroNow/infra"
 	"JiroNow/infra/x"
 	"JiroNow/oas"
@@ -11,12 +10,11 @@ import (
 )
 
 func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetParams) (oas.StoreStatusGetRes, error) {
-	env := env.NewEnv()
-	xBearerToken := env.XBearerToken
+	xBearerToken := h.XBearerToken
 	xClient := x.NewXClient(xBearerToken, http.DefaultClient)
 	xPostGetter := infra.NewXPostGetter(params.XAccountId, *xClient)
 
-	geminiToken := env.GeminiToken
+	geminiToken := h.GeminiToken
 	storeStatusChecker := infra.NewGeminiClientRetry(infra.NewgeminiClient(
 		geminiToken,
 		http.DefaultClient,
