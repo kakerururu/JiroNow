@@ -9,6 +9,7 @@ import (
 type env struct {
 	XBearerToken string
 	GeminiToken  string
+	Port         string
 }
 
 func NewEnv() (*env, error) {
@@ -22,8 +23,14 @@ func NewEnv() (*env, error) {
 		slog.Error("GEMINI_API_KEY not set")
 		return nil, fmt.Errorf("GEMINI_API_KEY not set")
 	}
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		slog.Error("PORT not set")
+		return nil, fmt.Errorf("PORT not set")
+	}
 	return &env{
 		XBearerToken: xBearreToken,
 		GeminiToken:  geminiToken,
+		Port:         port,
 	}, nil
 }
