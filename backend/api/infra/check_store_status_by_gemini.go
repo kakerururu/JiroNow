@@ -19,6 +19,7 @@ type GeminiClient struct {
 	googleApiKey string
 	endpoint     url.URL
 	httpClient   *http.Client
+	prompt       string
 }
 
 var Non200Error = fmt.Errorf("non-200 response from API")
@@ -30,10 +31,56 @@ func NewGeminiClient(key string, hc *http.Client) *GeminiClient {
 		Host:   "generativelanguage.googleapis.com",
 		Path:   "v1beta/models/gemini-2.0-flash:generateContent",
 	}
+	prompt := `
+		あなたは、飲食店の営業状況を判断するAIです。
+		ある店舗のSNSにおける投稿を元に、その店舗の営業状況を判断してください。
+		営業状況は「open」または「closed」のいずれかで答えてください。
+		判断に迷った場合は、確率が高い方を選んでください。
+
+		出力は以下の形式に従うこと。
+
+		{
+			"type": "string",
+			"enum": ["open", "closed"]
+		}
+
+		open, closedのいずれかを選択し、そのテキストだけを出力してください。
+		以下に出力例を示しますので、参考にしてください。
+
+		---
+
+		良い例:
+		open
+
+		悪い例1:
+		"open"
+
+		悪い例2:
+		{
+			"open"
+		}
+
+		悪い例3:
+		openの確率が高いです
+
+		悪い例4:
+		open
+		提示された投稿を見るに、営業状況は「open」であると考えられます。
+
+		悪い例5:
+		営業状況は「open」であると考えられます。
+
+		---
+
+		それでは、以下の投稿を基に営業状況を判断してください。
+
+		---
+	`
 	return &GeminiClient{
 		googleApiKey: key,
 		endpoint:     endpoint,
 		httpClient:   hc,
+		prompt:       prompt,
 	}
 }
 
@@ -45,7 +92,7 @@ func (s *GeminiClient) CheckStatus(ctx context.Context, input usecase.CheckStatu
 		"contents": []map[string]interface{}{
 			{
 				"parts": []map[string]string{
-					{"text": "以下の投稿を基に営業状況を判断してください: " + strings.Join(input.Posts, ", ") + "\n{ 'type': 'string', 'enum': ['open', 'closed'] }"},
+					{"text": s.prompt + strings.Join(input.Posts, "\n\n")},
 				},
 			},
 		},
@@ -113,9 +160,9 @@ type geminiClientRetry struct {
 }
 
 func NewGeminiClientRetry(geminiClient usecase.StoreStatusChecker) usecase.StoreStatusChecker {
-	return &geminiClientRetry{
+	return usecase.StoreStatusChecker(&geminiClientRetry{
 		geminiClient: geminiClient,
-	}
+	})
 }
 
 func (g *geminiClientRetry) CheckStatus(ctx context.Context, input usecase.CheckStatusInput) (usecase.StoreStatus, error) {
