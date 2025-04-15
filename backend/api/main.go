@@ -18,7 +18,7 @@ func main() {
 	}
 
 	xClient := x.NewXClient(envs.XBearerToken, http.DefaultClient)
-	geminiClient := infra.NewgeminiClient(envs.GeminiToken, http.DefaultClient)
+	geminiClient := infra.NewGeminiClient(envs.GeminiToken, http.DefaultClient)
 
 	h := handler.NewHandler(xClient, geminiClient)
 
