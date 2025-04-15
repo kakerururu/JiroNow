@@ -28,7 +28,7 @@ func main() {
 	}
 
 	log.Printf("Listening on %s ...", envs.Port)
-	if err := http.ListenAndServe(envs.Port, server); err != nil {
+	if err := http.ListenAndServe(":"+envs.Port, server); err != nil {
 		log.Fatal(err)
 	}
 }
