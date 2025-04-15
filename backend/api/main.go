@@ -8,10 +8,10 @@ import (
 	"JiroNow/oas"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
-
 	envs, err := env.NewEnv()
 	if err != nil {
 		log.Fatal(err)
@@ -27,8 +27,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Listening on %s ...", envs.Port)
-	if err := http.ListenAndServe(":"+envs.Port, server); err != nil {
+	log.Printf("Listening on %s ...", strconv.Itoa(envs.Port))
+	if err := http.ListenAndServe(":"+strconv.Itoa(envs.Port), server); err != nil {
 		log.Fatal(err)
 	}
 }

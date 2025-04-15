@@ -10,7 +10,7 @@ import (
 type env struct {
 	XBearerToken string
 	GeminiToken  string
-	Port         string
+	Port         int
 }
 
 func NewEnv() (*env, error) {
@@ -37,6 +37,6 @@ func NewEnv() (*env, error) {
 	return &env{
 		XBearerToken: xBearerToken,
 		GeminiToken:  geminiToken,
-		Port:         port,
+		Port:         portInt,
 	}, nil
 }
