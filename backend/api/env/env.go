@@ -14,7 +14,7 @@ type env struct {
 }
 
 func NewEnv() (*env, error) {
-	xBearreToken, ok := os.LookupEnv("X_BEARER_TOKEN")
+	xBearerToken, ok := os.LookupEnv("X_BEARER_TOKEN")
 	if !ok {
 		slog.Error("X_BEARER_TOKEN not set")
 		return nil, fmt.Errorf("X_BEARER_TOKEN not set")
@@ -35,7 +35,7 @@ func NewEnv() (*env, error) {
 		return nil, fmt.Errorf("invalid PORT value: %s", port)
 	}
 	return &env{
-		XBearerToken: xBearreToken,
+		XBearerToken: xBearerToken,
 		GeminiToken:  geminiToken,
 		Port:         port,
 	}, nil
