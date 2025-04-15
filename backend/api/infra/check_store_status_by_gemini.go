@@ -24,7 +24,7 @@ type GeminiClient struct {
 var Non200Error = fmt.Errorf("non-200 response from API")
 var GeminiNotJudgeError = fmt.Errorf("Gemini is not able to judge the status")
 
-func NewgeminiClient(key string, hc *http.Client) *GeminiClient {
+func NewGeminiClient(key string, hc *http.Client) *GeminiClient {
 	endpoint := url.URL{
 		Scheme: "https",
 		Host:   "generativelanguage.googleapis.com",

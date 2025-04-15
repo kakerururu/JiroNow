@@ -123,7 +123,7 @@ func TestGeminiClient_CheckStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := infra.NewgeminiClient(tt.fields.googleApiKey, tt.fields.httpClient)
+			s := infra.NewGeminiClient(tt.fields.googleApiKey, tt.fields.httpClient)
 			got, err := s.CheckStatus(tt.args.ctx, tt.args.input)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("GeminiClient.CheckStatus() error = %v, wantErr %v", err, tt.wantErr)
