@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 )
 
 type env struct {
@@ -25,8 +26,13 @@ func NewEnv() (*env, error) {
 	}
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
-		slog.Error("PORT not set")
-		return nil, fmt.Errorf("PORT not set")
+		slog.Warn("PORT not set, using default value 8080")
+		port = "8080"
+	}
+	portInt, err := strconv.Atoi(port)
+	if err != nil || portInt < 1 || portInt > 65535 {
+		slog.Error("Invalid PORT value, must be an integer between 1 and 65535")
+		return nil, fmt.Errorf("invalid PORT value: %s", port)
 	}
 	return &env{
 		XBearerToken: xBearreToken,
