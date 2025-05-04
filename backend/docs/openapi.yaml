@@ -25,6 +25,20 @@ paths:
         default:
           $ref: "#/components/responses/InternalServerErrorResponse"
 
+  /mock:
+    get:
+      description: "Mock endpoint for development. Always returns 'open'."
+      parameters:
+        - name: xAccountId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Account ID (for mock purposes)"
+      responses:
+        "200":
+          $ref: "#/components/responses/MockStatusResponse"
+
 components:
   responses:
     GetStoreStatusResponse:
@@ -75,3 +89,15 @@ components:
                 type: string
             required:
               - message
+    MockStatusResponse:
+      description: "Mock status response"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [open]
+            required:
+              - status

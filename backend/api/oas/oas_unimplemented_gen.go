@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// MockGet implements GET /mock operation.
+//
+// Mock endpoint for development. Always returns 'open'.
+//
+// GET /mock
+func (UnimplementedHandler) MockGet(ctx context.Context, params MockGetParams) (r *MockStatusResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // StoreStatusGet implements GET /store/status operation.
 //
 // Determines if a store is open or closed by analyzing posts associated with a given account.
@@ -20,12 +29,4 @@ var _ Handler = UnimplementedHandler{}
 // GET /store/status
 func (UnimplementedHandler) StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (r StoreStatusGetRes, _ error) {
 	return r, ht.ErrNotImplemented
-}
-
-// NewError creates *InternalServerErrorResponseStatusCode from error returned by handler.
-//
-// Used for common default response.
-func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *InternalServerErrorResponseStatusCode) {
-	r = new(InternalServerErrorResponseStatusCode)
-	return r
 }

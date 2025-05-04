@@ -27,6 +27,12 @@ func trimTrailingSlashes(u *url.URL) {
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
+	// MockGet invokes GET /mock operation.
+	//
+	// Mock endpoint for development. Always returns 'open'.
+	//
+	// GET /mock
+	MockGet(ctx context.Context, params MockGetParams) (*MockStatusResponse, error)
 	// StoreStatusGet invokes GET /store/status operation.
 	//
 	// Determines if a store is open or closed by analyzing posts associated with a given account.
@@ -40,12 +46,8 @@ type Client struct {
 	serverURL *url.URL
 	baseClient
 }
-type errorHandler interface {
-	NewError(ctx context.Context, err error) *InternalServerErrorResponseStatusCode
-}
 
 var _ Handler = struct {
-	errorHandler
 	*Client
 }{}
 
@@ -80,6 +82,95 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 		return c.serverURL
 	}
 	return u
+}
+
+// MockGet invokes GET /mock operation.
+//
+// Mock endpoint for development. Always returns 'open'.
+//
+// GET /mock
+func (c *Client) MockGet(ctx context.Context, params MockGetParams) (*MockStatusResponse, error) {
+	res, err := c.sendMockGet(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendMockGet(ctx context.Context, params MockGetParams) (res *MockStatusResponse, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/mock"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, MockGetOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/mock"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "xAccountId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "xAccountId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.XAccountId))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeMockGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
 }
 
 // StoreStatusGet invokes GET /store/status operation.

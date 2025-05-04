@@ -11,6 +11,64 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+// MockGetParams is parameters of GET /mock operation.
+type MockGetParams struct {
+	// Account ID (for mock purposes).
+	XAccountId string
+}
+
+func unpackMockGetParams(packed middleware.Parameters) (params MockGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "xAccountId",
+			In:   "query",
+		}
+		params.XAccountId = packed[key].(string)
+	}
+	return params
+}
+
+func decodeMockGetParams(args [0]string, argsEscaped bool, r *http.Request) (params MockGetParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: xAccountId.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "xAccountId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.XAccountId = c
+				return nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "xAccountId",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // StoreStatusGetParams is parameters of GET /store/status operation.
 type StoreStatusGetParams struct {
 	// Store's Twitter account ID.

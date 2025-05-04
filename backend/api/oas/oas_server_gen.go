@@ -8,16 +8,18 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// MockGet implements GET /mock operation.
+	//
+	// Mock endpoint for development. Always returns 'open'.
+	//
+	// GET /mock
+	MockGet(ctx context.Context, params MockGetParams) (*MockStatusResponse, error)
 	// StoreStatusGet implements GET /store/status operation.
 	//
 	// Determines if a store is open or closed by analyzing posts associated with a given account.
 	//
 	// GET /store/status
 	StoreStatusGet(ctx context.Context, params StoreStatusGetParams) (StoreStatusGetRes, error)
-	// NewError creates *InternalServerErrorResponseStatusCode from error returned by handler.
-	//
-	// Used for common default response.
-	NewError(ctx context.Context, err error) *InternalServerErrorResponseStatusCode
 }
 
 // Server implements http server based on OpenAPI v3 specification and

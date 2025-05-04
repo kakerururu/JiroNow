@@ -3,14 +3,8 @@
 package oas
 
 import (
-	"fmt"
-
 	"github.com/go-faster/errors"
 )
-
-func (s *InternalServerErrorResponseStatusCode) Error() string {
-	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
-}
 
 type AccountNotFoundResponse struct {
 	Message string `json:"message"`
@@ -123,6 +117,56 @@ func (s *InternalServerErrorResponseStatusCode) SetStatusCode(val int) {
 // SetResponse sets the value of Response.
 func (s *InternalServerErrorResponseStatusCode) SetResponse(val InternalServerErrorResponse) {
 	s.Response = val
+}
+
+func (*InternalServerErrorResponseStatusCode) storeStatusGetRes() {}
+
+type MockStatusResponse struct {
+	Status MockStatusResponseStatus `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *MockStatusResponse) GetStatus() MockStatusResponseStatus {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *MockStatusResponse) SetStatus(val MockStatusResponseStatus) {
+	s.Status = val
+}
+
+type MockStatusResponseStatus string
+
+const (
+	MockStatusResponseStatusOpen MockStatusResponseStatus = "open"
+)
+
+// AllValues returns all MockStatusResponseStatus values.
+func (MockStatusResponseStatus) AllValues() []MockStatusResponseStatus {
+	return []MockStatusResponseStatus{
+		MockStatusResponseStatusOpen,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s MockStatusResponseStatus) MarshalText() ([]byte, error) {
+	switch s {
+	case MockStatusResponseStatusOpen:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *MockStatusResponseStatus) UnmarshalText(data []byte) error {
+	switch MockStatusResponseStatus(data) {
+	case MockStatusResponseStatusOpen:
+		*s = MockStatusResponseStatusOpen
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type UnprocessableStoreStatusResponse struct {

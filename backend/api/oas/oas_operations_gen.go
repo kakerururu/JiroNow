@@ -6,5 +6,6 @@ package oas
 type OperationName = string
 
 const (
+	MockGetOperation        OperationName = "MockGet"
 	StoreStatusGetOperation OperationName = "StoreStatusGet"
 )
