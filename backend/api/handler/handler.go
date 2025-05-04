@@ -21,11 +21,9 @@ func NewHandler(xClient *x.XClient, gClinet *infra.GeminiClient) *handler {
 	}
 }
 
-func (*handler) NewError(ctx context.Context, err error) *oas.InternalServerErrorResponseStatusCode {
-	return &oas.InternalServerErrorResponseStatusCode{
-		StatusCode: 500,
-		Response: oas.InternalServerErrorResponse{
-			Message: "internal server error",
-		},
-	}
+func (*handler) MockGet(ctx context.Context, params oas.MockGetParams) (*oas.MockStatusResponse, error) {
+	// Always return "open" for the mock endpoint
+	return &oas.MockStatusResponse{
+		Status: "open",
+	}, nil
 }

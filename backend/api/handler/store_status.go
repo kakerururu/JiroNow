@@ -25,7 +25,7 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 		}, nil
 	case nil:
 	default:
-		return nil, h.NewError(ctx, err)
+		return nil, err
 	}
 
 	switch status {
@@ -38,6 +38,6 @@ func (h *handler) StoreStatusGet(ctx context.Context, params oas.StoreStatusGetP
 			Status: oas.GetStoreStatusResponseStatusClosed,
 		}, nil
 	default:
-		return nil, h.NewError(ctx, err)
+		return nil, err
 	}
 }
