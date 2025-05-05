@@ -1,0 +1,77 @@
+openapi: "3.0.3"
+info:
+  title: JiroNow API
+  version: "1.0"
+
+paths:
+  /store/status:
+    get:
+      description: "Determines if a store is open or closed by analyzing posts associated with a given account."
+      parameters:
+        - name: xAccountId
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "88kasyo"
+          description: "Store's Twitter account ID"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetStoreStatusResponse"
+        "404":
+          $ref: "#/components/responses/AccountNotFoundResponse"
+        "520":
+          $ref: "#/components/responses/UnprocessableStoreStatusResponse"
+        default:
+          $ref: "#/components/responses/InternalServerErrorResponse"
+
+components:
+  responses:
+    GetStoreStatusResponse:
+      description: "Store status response"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [open, closed]
+            required:
+              - status
+
+    AccountNotFoundResponse:
+      description: "the specified account does not exist"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+
+    UnprocessableStoreStatusResponse:
+      description: "Unable to determine store status from  specified account's posts"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+
+    InternalServerErrorResponse:
+      description: "Internal server error"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
