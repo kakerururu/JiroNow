@@ -3,7 +3,7 @@ module.exports = {
     input: '../docs/openapi.yaml',  // frontend/web から見たパス
     output: {
       mode: 'split',
-      target: './src/api/',         // web/src/api に生成
+      target: './jironow/src/api',
       client: 'axios',
       mock: true,
     },
