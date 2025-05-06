@@ -1,6 +1,6 @@
 module.exports = {
   jironow: {
-    input: '../docs/openapi.yaml',  // frontend/web から見たパス
+    input: '../../backend/docs/openapi.yaml',
     output: {
       mode: 'split',
       target: './jironow/src/api',
