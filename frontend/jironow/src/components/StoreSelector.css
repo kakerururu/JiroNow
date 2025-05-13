@@ -1,0 +1,55 @@
+.store-selector-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.store-selector-container label {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    /* Dark text for light mode */
+}
+
+.store-selector-container select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+    background-color: #fff;
+    /* White background */
+    color: #333;
+    /* Dark text */
+    cursor: pointer;
+}
+
+.store-selector-container select:focus {
+    outline: none;
+    border-color: #646cff;
+    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.2);
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .store-selector-container label {
+        color: rgba(255, 255, 255, 0.87);
+        /* Light text for dark mode */
+    }
+
+    .store-selector-container select {
+        background-color: #333;
+        /* Dark background */
+        color: rgba(255, 255, 255, 0.87);
+        /* Light text */
+        border-color: #555;
+    }
+
+    .store-selector-container select:focus {
+        box-shadow: 0 0 0 3px rgba(138, 138, 255, 0.4);
+    }
+}

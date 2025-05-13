@@ -20,7 +20,7 @@ import type {
 
 
 export const getGetStoreStatusResponseMock = (overrideResponse: Partial<GetStoreStatusResponseResponse> = {}): GetStoreStatusResponseResponse => ({ status: faker.helpers.arrayElement(['open', 'closed'] as const), ...overrideResponse })
-
+// Partial<> は「その型のプロパティが全部オプションになる」**というユーティリティ型
 
 export const getGetStoreStatusMockHandler = (overrideResponse?: GetStoreStatusResponseResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetStoreStatusResponseResponse> | GetStoreStatusResponseResponse)) => {
   return http.get('*/store/status', async (info) => {

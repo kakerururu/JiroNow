@@ -1,9 +1,9 @@
-module.exports = {
+export default {
   jironow: {
     input: '../../backend/docs/openapi.yaml',
     output: {
       mode: 'split',
-      target: './jironow/src/api',
+      target: './src/api',
       client: 'axios',
       mock: true,
     },

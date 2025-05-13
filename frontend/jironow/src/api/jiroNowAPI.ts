@@ -25,6 +25,7 @@ export const getJiroNowAPI = () => {
   const getStoreStatus = <TData = AxiosResponse<GetStoreStatusResponseResponse>>(
     params: GetStoreStatusParams, options?: AxiosRequestConfig
   ): Promise<TData> => {
+    console.log('getStoreStatus', params, options);
     return axios.get(
       `/store/status`, {
       ...options,

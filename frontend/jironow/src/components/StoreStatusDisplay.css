@@ -1,0 +1,55 @@
+.store-status-container {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    /* White background for light mode */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.store-status-container h2 {
+    margin-top: 0;
+    color: #333;
+    /* Dark text for light mode */
+    font-size: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.store-status-container p {
+    color: #555;
+    /* Slightly lighter text for light mode */
+    line-height: 1.6;
+}
+
+.store-status-container .loading,
+.store-status-container .error {
+    font-weight: bold;
+    text-align: center;
+}
+
+.store-status-container .error {
+    color: #d9534f;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .store-status-container {
+        background-color: #2a2a2a;
+        /* Dark background for dark mode */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .store-status-container h2 {
+        color: rgba(255, 255, 255, 0.87);
+        border-bottom-color: #444;
+    }
+
+    .store-status-container p {
+        color: rgba(255, 255, 255, 0.7);
+    }
+}

@@ -5,6 +5,45 @@
   text-align: center;
 }
 
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  /* Add space between elements */
+  padding: 40px;
+  background-color: #fff;
+  /* White background for the header */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Add a subtle shadow */
+  width: 100%;
+  max-width: 600px;
+  /* Limit header width */
+  box-sizing: border-box;
+}
+
+/* Dark mode styles for header */
+@media (prefers-color-scheme: dark) {
+  .App-header {
+    background-color: #2a2a2a;
+    /* Dark background for the header in dark mode */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Remove unused styles */
+/*
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -15,7 +54,7 @@
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop_shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
@@ -40,3 +79,4 @@
 .read-the-docs {
   color: #888;
 }
+*/
