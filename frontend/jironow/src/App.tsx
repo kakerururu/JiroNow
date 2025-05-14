@@ -1,57 +1,45 @@
-import './App.css';
 import { useState } from 'react';
-import { getJiroNowAPI } from './api/jiroNowAPI';
-import type { GetStoreStatusResponseResponse } from './api/jiroNowAPI.schemas';
 import { stores } from './stores';
 import StoreSelector from './components/StoreSelector';
 import StoreStatusDisplay from './components/StoreStatusDisplay';
+import { useStoreStatus } from './hooks/useStoreStatus';
 
 function App() {
     const [selectedStoreId, setSelectedStoreId] = useState(stores[0].id);
-    const [storeStatus, setStoreStatus] = useState<GetStoreStatusResponseResponse | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [showStatus, setShowStatus] = useState(false);
-
-    const fetchStoreStatus = async () => {
-        setLoading(true);
-        setError(null);
-        setShowStatus(false);
-        try {
-            const api = getJiroNowAPI();
-            const response = await api.getStoreStatus({ xAccountId: selectedStoreId });
-            setStoreStatus(response.data);
-            setShowStatus(true);
-        } catch (err) {
-            setError('Failed to fetch store status');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { storeStatus, loading, error, showStatus, fetchStoreStatus } = useStoreStatus();
 
     const handleStoreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedStoreId(event.target.value);
-        setStoreStatus(null);
-        setError(null);
-        setShowStatus(false);
+    };
+
+    const renderStoreStatus = () => {
+        if (loading) {
+            return <div className="p-4 text-blue-500">Loading...</div>;
+        }
+        if (error) {
+            return <div className="p-4 text-red-500">Error: {error}</div>;
+        }
+        if (showStatus) {
+            return <StoreStatusDisplay storeStatus={storeStatus} selectedStoreId={selectedStoreId} />;
+        }
+        return null;
     };
 
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>Jironow</h1>
-                <StoreSelector selectedStoreId={selectedStoreId} onStoreChange={handleStoreChange} />
-                <button onClick={fetchStoreStatus} disabled={loading}>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <header className="bg-white p-6 rounded-lg shadow-md text-center">
+                <h1 className="text-2xl font-bold mb-4">Jironow</h1>
+                <div className="mb-4">
+                    <StoreSelector selectedStoreId={selectedStoreId} onStoreChange={handleStoreChange} />
+                </div>
+                <button
+                    onClick={() => fetchStoreStatus(selectedStoreId)}
+                    disabled={loading}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                >
                     {loading ? 'Loading...' : '営業状況を見る'}
                 </button>
-                <StoreStatusDisplay
-                    storeStatus={storeStatus}
-                    loading={loading}
-                    error={error}
-                    showStatus={showStatus}
-                    selectedStoreId={selectedStoreId}
-                />
+                {renderStoreStatus()}
             </header>
         </div>
     );
